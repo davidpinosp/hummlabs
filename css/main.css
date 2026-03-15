@@ -1131,3 +1131,24 @@ body {
   line-height: 1.6;
   margin: 0;
 }
+
+.team-card-linkedin {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+
+.team-card-linkedin:hover {
+  color: var(--accent-bright, #7dd3fc);
+  opacity: 0.9;
+}
+
+.team-card-linkedin svg {
+  flex-shrink: 0;
+}
