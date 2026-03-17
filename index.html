@@ -3,22 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" href="favicon.png" />
-  <title>Humm Labs — Unseen Gaps. Cutting-Edge Technology.</title>
-  <meta name="description" content="Humm Labs identifica brechas invisibles en mercados y aplica tecnología de vanguardia. Laburo: IA para contratación frontline. Factory: fábrica de software con IA." />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon.png" />
+  <link rel="shortcut icon" href="favicon.png" />
+  <title>Humm Labs — Brechas invisibles. Tecnología de vanguardia.</title>
+  <meta name="description" content="Humm Labs identifica brechas invisibles en mercados y aplica tecnología de vanguardia. Laburo: IA para contratación frontline. Factory: sistemas de software a medida." />
+  <link rel="canonical" href="https://hummlabs.xyz/" />
+  <link rel="alternate" hreflang="es" href="https://hummlabs.xyz/" />
+  <link rel="alternate" hreflang="en" href="https://hummlabs.xyz/" />
+  <link rel="alternate" hreflang="x-default" href="https://hummlabs.xyz/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Humm Labs" />
   <meta property="og:locale" content="es_ES" />
   <meta property="og:locale:alternate" content="en_US" />
-  <meta property="og:title" content="Humm Labs — Unseen Gaps. Cutting-Edge Technology." />
-  <meta property="og:description" content="Venture lab que identifica brechas invisibles en mercados y construye productos de IA para llenarlas." />
+  <meta property="og:title" content="Humm Labs — Brechas invisibles. Tecnología de vanguardia." />
+  <meta property="og:description" content="Humm Labs identifica brechas invisibles en mercados y construye tecnología para resolverlas." />
   <meta property="og:image" content="whiteLogo.png" />
   <meta property="og:image:width" content="1024" />
   <meta property="og:image:height" content="1024" />
   <meta property="og:image:alt" content="Humm Labs logo" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Humm Labs — Unseen Gaps. Cutting-Edge Technology." />
-  <meta name="twitter:description" content="Identificamos brechas invisibles y construimos productos de IA que escalan." />
+  <meta name="twitter:title" content="Humm Labs — Brechas invisibles. Tecnología de vanguardia." />
+  <meta name="twitter:description" content="Identificamos brechas invisibles y construimos productos de tecnología que escalan." />
   <meta name="twitter:image" content="whiteLogo.png" />
   <meta name="theme-color" content="#0a0e17" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -32,7 +38,14 @@
   <header class="header">
     <div class="header-inner">
       <a href="index.html" class="logo"><img src="whiteLogo.png" alt="" class="logo-img" width="40" height="40" /><span class="logo-text" data-i18n="logo">Humm Labs</span></a>
-      <nav class="nav">
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Open navigation">
+        <span class="nav-toggle-box" aria-hidden="true">
+          <span class="nav-toggle-line"></span>
+          <span class="nav-toggle-line"></span>
+          <span class="nav-toggle-line"></span>
+        </span>
+      </button>
+      <nav class="nav" id="site-nav">
         <a href="index.html#products" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span><span data-i18n="nav_products">Products</span></a>
         <a href="mission.html" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span data-i18n="nav_mission">Mission</span></a>
         <a href="team.html" class="nav-link"><span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span data-i18n="nav_team">Team</span></a>

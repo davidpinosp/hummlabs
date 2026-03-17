@@ -84,7 +84,17 @@
       team_page_title: 'Team',
       team_page_lead: 'The people behind Humm Labs. We find the gaps and build what fills them.',
       team_david_role: 'Founder',
-      team_david_bio: 'Leading Humm Labs in identifying unseen market gaps and applying cutting-edge technology to build products that scale.'
+      team_david_bio: 'Leading Humm Labs in identifying unseen market gaps and applying cutting-edge technology to build products that scale.',
+      meta_home_title: 'Humm Labs — Unseen Gaps. Cutting-Edge Technology.',
+      meta_home_desc: 'Humm Labs identifies unseen market gaps and applies cutting-edge technology. Laburo: AI frontline hiring. Factory: custom software systems.',
+      meta_mission_title: 'Mission — Humm Labs',
+      meta_mission_desc: 'The mission of Humm Labs: identify unseen gaps and apply cutting-edge technology to close them.',
+      meta_laburo_title: 'Laburo — AI Hiring for Frontline | Humm Labs',
+      meta_laburo_desc: 'Laburo is an AI hiring agent for frontline roles. Source, screen, and schedule interviews at scale.',
+      meta_factory_title: 'Factory — Premium Websites & Automations | Humm Labs',
+      meta_factory_desc: 'Factory builds premium websites, automations, and custom systems designed for conversion and measurable business outcomes.',
+      meta_team_title: 'Team — Humm Labs',
+      meta_team_desc: 'The people behind Humm Labs and the products built to close market gaps.'
     },
     es: {
       logo: 'Humm Labs',
@@ -166,7 +176,17 @@
       team_page_title: 'Equipo',
       team_page_lead: 'Las personas detrás de Humm Labs. Encontramos las brechas y construimos lo que las llena.',
       team_david_role: 'Fundador',
-      team_david_bio: 'Liderando Humm Labs en la identificación de brechas invisibles en el mercado y la aplicación de tecnología de vanguardia para construir productos que escalan.'
+      team_david_bio: 'Liderando Humm Labs en la identificación de brechas invisibles en el mercado y la aplicación de tecnología de vanguardia para construir productos que escalan.',
+      meta_home_title: 'Humm Labs — Brechas invisibles. Tecnología de vanguardia.',
+      meta_home_desc: 'Humm Labs identifica brechas invisibles en mercados y aplica tecnología de vanguardia. Laburo: IA para contratación frontline. Factory: sistemas de software a medida.',
+      meta_mission_title: 'Misión — Humm Labs',
+      meta_mission_desc: 'La misión de Humm Labs: identificar brechas invisibles y aplicar tecnología de vanguardia para resolverlas.',
+      meta_laburo_title: 'Laburo — Contratación IA para Frontline | Humm Labs',
+      meta_laburo_desc: 'Laburo es un agente de IA para contratación frontline. Recluta, filtra y agenda entrevistas a escala.',
+      meta_factory_title: 'Factory — Sitios Web y Automatizaciones Premium | Humm Labs',
+      meta_factory_desc: 'Factory construye sitios web premium, automatizaciones y sistemas a medida diseñados para conversión y resultados de negocio medibles.',
+      meta_team_title: 'Equipo — Humm Labs',
+      meta_team_desc: 'Las personas detrás de Humm Labs y de los productos que cierran brechas de mercado.'
     }
   };
 
@@ -175,6 +195,11 @@
       var stored = localStorage.getItem(LANG_KEY);
       if (stored === 'es' || stored === 'en') return stored;
     } catch (e) {}
+    var browserLang = '';
+    try {
+      browserLang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+    } catch (e) {}
+    if (browserLang.indexOf('en') === 0) return 'en';
     return 'es';
   }
 
@@ -202,6 +227,46 @@
       btn.classList.toggle('active', isActive);
       btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
     });
+    applyMetaTranslations(lang);
+  }
+
+  function getMetaKeyPrefix() {
+    var path = '';
+    try {
+      path = (window.location.pathname || '').toLowerCase();
+    } catch (e) {}
+    var file = path.split('/').pop();
+    if (!file) file = 'index.html';
+    if (file === 'index.html') return 'home';
+    if (file === 'mission.html') return 'mission';
+    if (file === 'laburo.html') return 'laburo';
+    if (file === 'factory.html') return 'factory';
+    if (file === 'team.html') return 'team';
+    return '';
+  }
+
+  function setMetaAttr(selector, attr, value) {
+    if (!value) return;
+    var el = document.querySelector(selector);
+    if (!el) return;
+    el.setAttribute(attr, value);
+  }
+
+  function applyMetaTranslations(lang) {
+    var t = translations[lang] || translations.en;
+    var prefix = getMetaKeyPrefix();
+    if (!prefix) return;
+
+    var title = t['meta_' + prefix + '_title'];
+    var desc = t['meta_' + prefix + '_desc'];
+    if (title) document.title = title;
+    if (desc) setMetaAttr('meta[name="description"]', 'content', desc);
+    if (title) setMetaAttr('meta[property="og:title"]', 'content', title);
+    if (desc) setMetaAttr('meta[property="og:description"]', 'content', desc);
+    if (title) setMetaAttr('meta[name="twitter:title"]', 'content', title);
+    if (desc) setMetaAttr('meta[name="twitter:description"]', 'content', desc);
+    setMetaAttr('meta[property="og:locale"]', 'content', lang === 'es' ? 'es_ES' : 'en_US');
+    setMetaAttr('meta[property="og:locale:alternate"]', 'content', lang === 'es' ? 'en_US' : 'es_ES');
   }
 
   function initLang() {
@@ -231,6 +296,43 @@
         ticking = true;
       }
     }, { passive: true });
+  }
+
+  function initMobileNav() {
+    var header = document.querySelector('.header');
+    var toggle = document.querySelector('.nav-toggle');
+    var nav = document.querySelector('.nav');
+    if (!header || !toggle || !nav) return;
+
+    function setOpen(open) {
+      header.classList.toggle('nav-open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+    }
+
+    toggle.addEventListener('click', function () {
+      setOpen(!header.classList.contains('nav-open'));
+    });
+
+    nav.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', function () {
+        setOpen(false);
+      });
+    });
+
+    document.addEventListener('click', function (event) {
+      if (!header.classList.contains('nav-open')) return;
+      if (header.contains(event.target)) return;
+      setOpen(false);
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') setOpen(false);
+    });
+
+    window.addEventListener('resize', function () {
+      if (window.innerWidth > 900) setOpen(false);
+    });
   }
 
   function initReveals() {
@@ -269,6 +371,7 @@
   function init() {
     initLang();
     initHeaderScroll();
+    initMobileNav();
     initReveals();
   }
 
