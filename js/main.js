@@ -10,8 +10,8 @@
       nav_bird: "Hummingbird",
       nav_laburo: "Laburo",
       hero_label: "Idea Lab",
-      hero_title: "We terraform.\nWhere there was nothing, something grows.",
-      hero_desc: "Humm Labs is an idea lab. We invent and build things that shape our surroundings and help them flourish.",
+      hero_title: "We build, acquire, scale, and operate innovative ventures.",
+      hero_desc: "Humm Labs is an idea lab. We create things that shape our surroundings and help them flourish.",
       mission_eyebrow: "What we believe",
       mission_title: "Create, and help things grow.",
       mission_body: "We started Humm Labs to invent. We build companies that create real value, and we want everything we make to leave the people and places around it better off.",
@@ -29,9 +29,8 @@
       laburo_desc: "The AI hiring operating system for LatAm. It helps companies hire frontline teams, and helps people find work sooner.",
       laburo_cta: "Visit Laburo",
       next_teaser: "More ideas are taking shape.",
-      footer_tagline: "We terraform.",
-      meta_home_title: "Humm Labs — We terraform.",
-      meta_home_desc: "Humm Labs is an idea lab. We invent and build things that shape our surroundings and help them flourish. Our first project is Laburo, the AI hiring operating system for LatAm."
+      meta_home_title: "Humm Labs — Idea Lab",
+      meta_home_desc: "Humm Labs is an idea lab. We build, acquire, scale, and operate innovative ventures. Our first project is Laburo, the AI hiring operating system for LatAm."
     },
     es: {
       logo: "Humm Labs",
@@ -39,8 +38,8 @@
       nav_bird: "Colibrí",
       nav_laburo: "Laburo",
       hero_label: "Idea Lab",
-      hero_title: "Terraformamos.\nDonde no había nada, algo crece.",
-      hero_desc: "Humm Labs es un idea lab. Inventamos y construimos cosas que dan forma a nuestro entorno y lo ayudan a florecer.",
+      hero_title: "Construimos, adquirimos, escalamos y operamos empresas innovadoras.",
+      hero_desc: "Humm Labs es un idea lab. Creamos cosas que dan forma a nuestro entorno y lo ayudan a florecer.",
       mission_eyebrow: "En qué creemos",
       mission_title: "Crear, y ayudar a que las cosas crezcan.",
       mission_body: "Empezamos Humm Labs para inventar. Construimos empresas que crean valor real, y queremos que todo lo que hacemos deje mejor a las personas y los lugares que lo rodean.",
@@ -58,9 +57,8 @@
       laburo_desc: "El sistema operativo de contratación con IA para LatAm. Ayuda a las empresas a contratar equipos frontline, y a las personas a encontrar trabajo antes.",
       laburo_cta: "Visitar Laburo",
       next_teaser: "Más ideas están tomando forma.",
-      footer_tagline: "Terraformamos.",
-      meta_home_title: "Humm Labs — Terraformamos.",
-      meta_home_desc: "Humm Labs es un idea lab. Inventamos y construimos cosas que dan forma a nuestro entorno y lo ayudan a florecer. Nuestro primer proyecto es Laburo, el sistema operativo de contratación con IA para LatAm."
+      meta_home_title: "Humm Labs — Idea Lab",
+      meta_home_desc: "Humm Labs es un idea lab. Construimos, adquirimos, escalamos y operamos empresas innovadoras. Nuestro primer proyecto es Laburo, el sistema operativo de contratación con IA para LatAm."
     }
   };
 

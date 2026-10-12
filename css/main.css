@@ -161,10 +161,6 @@ body {
   flex-shrink: 0;
 }
 
-.logo-img--footer {
-  height: 34px;
-}
-
 .logo-text {
   font-family: var(--font-serif);
   font-weight: 700;
@@ -172,20 +168,6 @@ body {
   letter-spacing: -0.02em;
   color: var(--text-primary);
   transition: color var(--duration-fast);
-}
-
-.footer-logo {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.footer-logo .logo-text {
-  font-size: 1rem;
-}
-
-.footer-logo:hover .logo-text {
-  color: var(--accent);
 }
 
 .nav {
@@ -296,7 +278,7 @@ body {
 }
 
 .hero-text {
-  max-width: 48ch;
+  max-width: 34rem;
 }
 
 .hero-art {
@@ -372,7 +354,7 @@ body {
   text-wrap: balance;
   font-family: var(--font-serif);
   font-weight: 600;
-  font-size: clamp(2.5rem, 5.5vw, 4rem);
+  font-size: clamp(2.1rem, 4vw, 3.3rem);
   line-height: 1.08;
   letter-spacing: -0.01em;
   margin: 0 0 1.5rem;
@@ -559,47 +541,20 @@ body {
 .footer-inner {
   max-width: var(--container);
   margin: 0 auto;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-}
-
-.footer-logo {
-  text-decoration: none;
-}
-
-.footer-links {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.footer-links a {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  text-decoration: none;
-}
-
-.footer-links a:hover {
-  color: var(--text-primary);
-}
-
-.footer-tagline {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 0.9375rem;
-  color: var(--text-muted);
-  margin: 0;
-  width: 100%;
   text-align: center;
 }
 
-@media (min-width: 640px) {
-  .footer-tagline {
-    width: auto;
-    text-align: right;
-  }
+.footer-email {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.0625rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color var(--duration-fast);
+}
+
+.footer-email:hover {
+  color: var(--accent);
 }
 
 /* ========== Header responsive nav ========== */
