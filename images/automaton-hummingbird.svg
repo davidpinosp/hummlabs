@@ -63,7 +63,7 @@
     <path d="M160 221 C117 233 80 245 50 259 C82 241 120 227 160 229 Z" opacity="0.52" />
   </g>
 
-  <path d="M330 190 C366 188 397 198 422 213 C397 202 363 198 330 203 Z" fill="url(#beakGrad)" stroke="#3a2a12" stroke-width="2" stroke-linejoin="round" />
+  <path d="M330 184 C368 183 400 196 422 213 C398 201 362 196 330 206 Z" fill="url(#beakGrad)" stroke="#3a2a12" stroke-width="2.4" stroke-linejoin="round" />
 
   <use href="#bodyPath" fill="url(#bodyGrad)" stroke="#3a2a12" stroke-width="2.5" />
 
