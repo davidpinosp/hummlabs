@@ -6,53 +6,41 @@
   var translations = {
     en: {
       logo: "Humm Labs",
-      nav_bird: "Hummingbird",
       nav_laburo: "Laburo",
       hero_label: "Idea Lab",
-      hero_title: "We build, acquire, scale, and operate innovative ventures.",
-      hero_desc: "Humm Labs is an idea lab. We create things that shape our surroundings and help them flourish.",
-      bird_eyebrow: "Why the hummingbird",
-      bird_title: "A small bird with a large effect.",
-      bird_intro: "The hummingbird is our family’s animal. It never stops moving, and as it travels from flower to flower, the whole garden grows. That’s how we want to work.",
-      laburo_eyebrow: "Our first project",
+      hero_title: "Technology for the world we want to live in.",
+      hero_desc: "Humm Labs is an idea lab. We build, acquire, scale, and operate technology ventures.",
+      beat_2_title: "Every idea starts as a sketch.",
+      beat_2_desc: "We look closely at real problems, then design the software and AI to solve them.",
+      beat_3_title: "Then we build it to last.",
+      beat_3_desc: "We turn ideas into companies, run them with care, and let them leave their surroundings better than they found them.",
+      scroll_cue: "Scroll",
+      laburo_eyebrow: "Our first venture",
       status_live: "Live",
       laburo_desc: "The AI hiring operating system for LatAm. It helps companies hire frontline teams, and helps people find work sooner.",
       laburo_cta: "Visit Laburo",
-      next_teaser: "More ideas are taking shape.",
-      meta_home_title: "Humm Labs — Idea Lab",
-      meta_home_desc: "Humm Labs is an idea lab. We build, acquire, scale, and operate innovative ventures. Our first project is Laburo, the AI hiring operating system for LatAm.",
-      value_1_title: "Invent",
-      value_1_desc: "We started Humm Labs to invent. We’d rather make something new than repeat what already exists.",
-      value_2_title: "Do it well",
-      value_2_desc: "Care in the details. We build companies that create real value and are made to last.",
-      value_3_title: "Help it flourish",
-      value_3_desc: "Good companies lift everyone around them: teams, customers, communities.",
-      scroll_cue: "Scroll"
+      next_teaser: "More ventures are taking shape.",
+      meta_home_title: "Humm Labs — Technology for the world we want to live in",
+      meta_home_desc: "Humm Labs is an idea lab. We build, acquire, scale, and operate technology ventures. Our first is Laburo, the AI hiring operating system for LatAm."
     },
     es: {
       logo: "Humm Labs",
-      nav_bird: "Colibrí",
       nav_laburo: "Laburo",
       hero_label: "Idea Lab",
-      hero_title: "Construimos, adquirimos, escalamos y operamos empresas innovadoras.",
-      hero_desc: "Humm Labs es un idea lab. Creamos cosas que dan forma a nuestro entorno y lo ayudan a florecer.",
-      bird_eyebrow: "Por qué el colibrí",
-      bird_title: "Un ave pequeña con un gran efecto.",
-      bird_intro: "El colibrí es el animal de nuestra familia. Nunca deja de moverse, y mientras va de flor en flor, todo el jardín crece. Así queremos trabajar.",
-      laburo_eyebrow: "Nuestro primer proyecto",
+      hero_title: "Tecnología para el mundo en el que queremos vivir.",
+      hero_desc: "Humm Labs es un idea lab. Construimos, adquirimos, escalamos y operamos empresas de tecnología.",
+      beat_2_title: "Toda idea empieza como un boceto.",
+      beat_2_desc: "Miramos de cerca problemas reales y luego diseñamos el software y la IA para resolverlos.",
+      beat_3_title: "Después, la construimos para que dure.",
+      beat_3_desc: "Convertimos ideas en empresas, las operamos con cuidado y dejamos que mejoren el entorno que las rodea.",
+      scroll_cue: "Desliza",
+      laburo_eyebrow: "Nuestra primera empresa",
       status_live: "En vivo",
       laburo_desc: "El sistema operativo de contratación con IA para LatAm. Ayuda a las empresas a contratar equipos frontline, y a las personas a encontrar trabajo antes.",
       laburo_cta: "Visitar Laburo",
-      next_teaser: "Más ideas están tomando forma.",
-      meta_home_title: "Humm Labs — Idea Lab",
-      meta_home_desc: "Humm Labs es un idea lab. Construimos, adquirimos, escalamos y operamos empresas innovadoras. Nuestro primer proyecto es Laburo, el sistema operativo de contratación con IA para LatAm.",
-      value_1_title: "Inventar",
-      value_1_desc: "Empezamos Humm Labs para inventar. Preferimos hacer algo nuevo antes que repetir lo que ya existe.",
-      value_2_title: "Hacerlo bien",
-      value_2_desc: "Cuidado en los detalles. Construimos empresas que crean valor real y están hechas para durar.",
-      value_3_title: "Ayudar a florecer",
-      value_3_desc: "Las buenas empresas elevan a todos a su alrededor: equipos, clientes, comunidades.",
-      scroll_cue: "Desliza"
+      next_teaser: "Otras empresas están tomando forma.",
+      meta_home_title: "Humm Labs — Tecnología para el mundo en el que queremos vivir",
+      meta_home_desc: "Humm Labs es un idea lab. Construimos, adquirimos, escalamos y operamos empresas de tecnología. La primera es Laburo, el sistema operativo de contratación con IA para LatAm."
     }
   };
 
@@ -241,39 +229,68 @@
     } catch (e) {}
     if (reducedMotion) return;
 
-    var FRAME_COUNT = 160;
+    // Frames 0-33 are the drawing, 34-113 the assembly into the automaton.
+    var FRAME_COUNT = 114;
+    var DRAWING_END = 33;
+    var LAST = FRAME_COUNT - 1;
+    // Scroll progress -> frame. Flat segments hold the image still while a
+    // statement is on screen; the animation only plays between statements.
+    var TIMELINE = [
+      { to: 0.12, from: 0, until: 0 },
+      { to: 0.36, from: 0, until: DRAWING_END },
+      { to: 0.5, from: DRAWING_END, until: DRAWING_END },
+      { to: 0.88, from: DRAWING_END, until: LAST },
+      { to: 1, from: LAST, until: LAST }
+    ];
+    var FADE = 0.035;
+    var AVIF_PROBE = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAAD5bWV0YQAAAAAAAAAvaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAFBpY3R1cmVIYW5kbGVyAAAAAA5waXRtAAAAAAABAAAAHmlsb2MAAAAARAAAAQABAAAAAQAAASEAAAAUAAAAKGlpbmYAAAAAAAEAAAAaaW5mZQIAAAAAAQAAYXYwMUNvbG9yAAAAAGppcHJwAAAAS2lwY28AAAAUaXNwZQAAAAAAAAACAAAAAgAAABBwaXhpAAAAAAMICAgAAAAMYXYxQ4EADAAAAAATY29scm5jbHgAAgACAAIAAAAAF2lwbWEAAAAAAAAAAQABBAECgwQAAAAcbWRhdAoFGAA2wCAyCx/wAABYAAAAAK8w';
+
     var mobileQuery = window.matchMedia('(max-width: 860px)');
     var ctx = canvas.getContext('2d');
     var cue = pin.querySelector('.hero-scroll-cue');
     var beats = Array.prototype.map.call(pin.querySelectorAll('.beat'), function (el, i, all) {
       return {
         el: el,
-        start: parseFloat(el.getAttribute('data-start')),
-        end: parseFloat(el.getAttribute('data-end')),
+        start: parseFloat(el.getAttribute('data-in')),
+        end: parseFloat(el.getAttribute('data-out')),
         first: i === 0,
         last: i === all.length - 1
       };
     });
 
+    var format = null;
     var frames = [];
     var set = '';
     var progress = 0;
     var drawnIndex = -1;
-    var drawnSet = '';
+    var ticking = false;
 
     pin.classList.add('hero-animated');
 
-    function framePath(i) {
-      return 'media/hero/' + set + '/' + ('00' + i).slice(-3) + '.webp';
+    function frameAt(p) {
+      var segStart = 0;
+      for (var i = 0; i < TIMELINE.length; i++) {
+        var seg = TIMELINE[i];
+        if (p <= seg.to || i === TIMELINE.length - 1) {
+          var t = seg.to > segStart ? (p - segStart) / (seg.to - segStart) : 1;
+          t = Math.max(0, Math.min(1, t));
+          return Math.round(seg.from + (seg.until - seg.from) * t);
+        }
+        segStart = seg.to;
+      }
+      return LAST;
     }
 
-    // Coarse-to-fine: first and last frames, then every 16th, 8th, ... so the
-    // whole timeline is scrubbable almost immediately and sharpens as it loads.
+    function framePath(i) {
+      return 'media/hero/' + set + '/' + format + '/' + ('00' + i).slice(-3) + '.' + format;
+    }
+
+    // The frames the visitor rests on load first, then the timeline fills in coarse-to-fine.
     function loadOrder() {
-      var order = [0, FRAME_COUNT - 1];
+      var order = [0, DRAWING_END, LAST];
       var seen = {};
-      seen[0] = seen[FRAME_COUNT - 1] = true;
-      [16, 8, 4, 2, 1].forEach(function (step) {
+      order.forEach(function (i) { seen[i] = true; });
+      [12, 6, 3, 1].forEach(function (step) {
         for (var i = 0; i < FRAME_COUNT; i += step) {
           if (!seen[i]) {
             seen[i] = true;
@@ -289,6 +306,7 @@
       if (nextSet === set) return;
       set = nextSet;
       frames = new Array(FRAME_COUNT);
+      drawnIndex = -1;
       var queue = loadOrder();
       var active = 0;
       var token = set;
@@ -297,6 +315,7 @@
         while (active < 6 && queue.length) {
           var i = queue.shift();
           var img = new Image();
+          img.decoding = 'async';
           active++;
           img.onload = img.onerror = (function (index, image) {
             return function (event) {
@@ -345,6 +364,8 @@
       // When the viewport is narrower than the frame, crop mostly from the empty left side.
       var x = (cw - w) * (set === 'desktop' ? 0.35 : 0.5);
       var y = (ch - h) * 0.5;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
       ctx.fillStyle = '#110c07';
       ctx.fillRect(0, 0, cw, ch);
       ctx.drawImage(img, x, y, w, h);
@@ -356,16 +377,16 @@
     }
 
     function updateBeats() {
-      var fade = 0.05;
       beats.forEach(function (b) {
-        var fadeIn = b.first ? 1 : smoothstep(b.start, b.start + fade, progress);
-        var fadeOut = b.last ? 1 : 1 - smoothstep(b.end - fade, b.end, progress);
+        var fadeIn = b.first ? 1 : smoothstep(b.start, b.start + FADE, progress);
+        var fadeOut = b.last ? 1 : 1 - smoothstep(b.end - FADE, b.end, progress);
         var o = Math.min(fadeIn, fadeOut);
+        var shift = progress < b.start + FADE ? 12 : -12;
         b.el.style.opacity = o;
-        b.el.style.transform = 'translateY(' + ((1 - o) * (progress < b.start + fade ? 14 : -14)) + 'px)';
+        b.el.style.transform = 'translateY(' + ((1 - o) * shift) + 'px)';
         b.el.style.visibility = o < 0.01 ? 'hidden' : 'visible';
       });
-      if (cue) cue.style.opacity = 1 - smoothstep(0, 0.03, progress);
+      if (cue) cue.style.opacity = 1 - smoothstep(0, 0.04, progress);
     }
 
     function render() {
@@ -375,17 +396,15 @@
       progress = scrollable > 0 ? Math.max(0, Math.min(1, -rect.top / scrollable)) : 0;
 
       updateBeats();
+      if (!format) return;
       resizeCanvas();
-      var target = Math.round(progress * (FRAME_COUNT - 1));
-      var index = nearestLoaded(target);
-      if (index >= 0 && (index !== drawnIndex || drawnSet !== set)) {
+      var index = nearestLoaded(frameAt(progress));
+      if (index >= 0 && index !== drawnIndex) {
         drawFrame(index);
         drawnIndex = index;
-        drawnSet = set;
       }
     }
 
-    var ticking = false;
     function schedule() {
       if (!ticking) {
         ticking = true;
@@ -393,16 +412,24 @@
       }
     }
 
-    function onResize() {
+    function start(supportsAvif) {
+      format = supportsAvif ? 'avif' : 'webp';
       loadFrames();
-      drawnIndex = -1;
       schedule();
     }
 
     window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', onResize);
-    loadFrames();
+    window.addEventListener('resize', function () {
+      if (format) loadFrames();
+      drawnIndex = -1;
+      schedule();
+    });
     schedule();
+
+    var probe = new Image();
+    probe.onload = function () { start(probe.naturalWidth > 0); };
+    probe.onerror = function () { start(false); };
+    probe.src = AVIF_PROBE;
   }
 
   function init() {

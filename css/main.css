@@ -2,6 +2,38 @@
    Humm Labs — Design system (Gilded Automaton)
    ============================================ */
 
+@font-face {
+  font-family: 'Instrument Serif';
+  src: url('../fonts/instrument-serif.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Instrument Serif';
+  src: url('../fonts/instrument-serif-italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist';
+  src: url('../fonts/geist.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('../fonts/geist-mono.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* Core palette — warm bronze-black, not cold navy */
   --bg-deep: #0b0804;
@@ -22,7 +54,9 @@
   --accent-dim: rgba(214, 172, 90, 0.14);
   --accent-glow: rgba(214, 172, 90, 0.3);
 
-  --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
   /* Motion — slower, breathing rather than snapping */
   --ease-out: cubic-bezier(0.19, 1, 0.22, 1);
@@ -52,9 +86,10 @@ html {
 
 body {
   margin: 0;
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: var(--font-sans);
   font-size: 1rem;
   line-height: 1.6;
+  font-synthesis: none;
   color: var(--text-primary);
   background: var(--bg-main);
   -webkit-font-smoothing: antialiased;
@@ -71,18 +106,18 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Kicker label — a quiet, literary marker, not a HUD readout */
+/* Kicker label — a small technical caption */
 .eyebrow,
 .hero-label,
 .status-dot {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 500;
-  font-size: 0.95rem;
-  letter-spacing: 0.02em;
+  gap: 0.7rem;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   color: var(--accent);
 }
 
@@ -163,9 +198,9 @@ body {
 
 .logo-text {
   font-family: var(--font-serif);
-  font-weight: 700;
-  font-size: 1.25rem;
-  letter-spacing: -0.02em;
+  font-weight: 400;
+  font-size: 1.55rem;
+  letter-spacing: 0;
   color: var(--text-primary);
   transition: color var(--duration-fast);
 }
@@ -202,7 +237,7 @@ body {
 
 .lang-btn {
   padding: 0.4rem 0.65rem;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.8125rem;
   font-weight: 500;
   color: var(--text-muted);
@@ -223,18 +258,20 @@ body {
 
 /* ========== Hero ==========
    Default (no JS / reduced motion): a static hero over the finished automaton,
-   with all four statements stacked. With .hero-animated, the hero pins and a
-   canvas scrubs through the sketch-to-automaton frames as the page scrolls. */
+   with the three statements stacked. With .hero-animated, the hero pins and a
+   canvas scrubs through the sketch-to-automaton frames as the page scrolls;
+   the animation holds still whenever a statement is on screen. */
 .hero {
   position: relative;
   min-height: 100vh;
   display: flex;
-  align-items: center;
-  padding: 7rem 1.5rem 5rem;
+  align-items: flex-end;
+  padding: 8rem 1.5rem 6rem;
   overflow: hidden;
   background:
-    linear-gradient(180deg, rgba(17, 12, 7, 0) calc(56.25vw - 10rem), var(--bg-main) 56.25vw),
-    var(--bg-main) url("../media/hero/desktop/159.webp") center top / 100% auto no-repeat;
+    linear-gradient(90deg, var(--bg-main) 10%, rgba(17, 12, 7, 0) 24%),
+    linear-gradient(180deg, rgba(17, 12, 7, 0) calc(50.6vw - 10rem), var(--bg-main) 50.6vw),
+    var(--bg-main) url("../media/hero/desktop/webp/113.webp") right top / 90% auto no-repeat;
 }
 
 .hero-canvas {
@@ -250,8 +287,8 @@ body {
   inset: 0;
   pointer-events: none;
   background:
-    linear-gradient(90deg, rgba(17, 12, 7, 0.88) 0%, rgba(17, 12, 7, 0.6) 32%, rgba(17, 12, 7, 0) 58%),
-    linear-gradient(180deg, rgba(17, 12, 7, 0) 72%, var(--bg-main) 100%);
+    radial-gradient(120% 95% at 0% 100%, rgba(17, 12, 7, 0.94) 0%, rgba(17, 12, 7, 0.62) 34%, rgba(17, 12, 7, 0) 64%),
+    linear-gradient(180deg, rgba(17, 12, 7, 0.45) 0%, rgba(17, 12, 7, 0) 16%, rgba(17, 12, 7, 0) 78%, var(--bg-main) 100%);
 }
 
 .hero-content {
@@ -264,43 +301,40 @@ body {
 
 .hero-beats {
   display: grid;
-  gap: 2.5rem;
-  max-width: 31rem;
+  gap: 3rem;
+  max-width: 34rem;
 }
 
 .hero-label {
-  margin: 0 0 1.5rem;
+  margin: 0 0 1.4rem;
+}
+
+.hero-title,
+.beat-title {
+  text-wrap: balance;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  margin: 0 0 1.1rem;
 }
 
 .hero-title {
-  text-wrap: balance;
-  font-family: var(--font-serif);
-  font-weight: 600;
-  font-size: clamp(2.1rem, 4vw, 3.3rem);
-  line-height: 1.08;
-  letter-spacing: -0.01em;
-  margin: 0 0 1.5rem;
-}
-
-.hero-desc,
-.beat-desc {
-  font-size: 1.125rem;
-  color: var(--text-secondary);
-  max-width: 42ch;
-  margin: 0;
-}
-
-.beat .numeral {
-  font-size: 1.6rem;
-  margin-bottom: 0.75rem;
+  font-size: clamp(2.4rem, 4.4vw, 3.75rem);
 }
 
 .beat-title {
-  font-family: var(--font-serif);
-  font-weight: 600;
-  font-size: clamp(2rem, 3.6vw, 3rem);
-  line-height: 1.1;
-  margin: 0 0 1rem;
+  font-size: clamp(2rem, 3.4vw, 2.9rem);
+}
+
+.beat-desc {
+  text-wrap: pretty;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  max-width: 40ch;
+  margin: 0;
 }
 
 .hero-scroll-cue {
@@ -309,7 +343,7 @@ body {
 
 /* Scroll-driven mode */
 .hero-animated {
-  height: 420vh;
+  height: 500vh;
 }
 
 .hero-animated .hero {
@@ -317,23 +351,35 @@ body {
   top: 0;
   height: 100vh;
   min-height: 0;
-  padding-top: 5rem;
-  padding-bottom: 3rem;
-  background: var(--bg-main) url("../media/hero/desktop/000.webp") 35% center / cover no-repeat;
+  padding: 0;
+  background: var(--bg-main) url("../media/hero/desktop/webp/000.webp") 35% center / cover no-repeat;
 }
 
 .hero-animated .hero-canvas {
   display: block;
 }
 
+.hero-animated .hero-content {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(3.5rem, 11vh, 7rem);
+  padding: 0 1.5rem;
+  max-width: none;
+}
+
 .hero-animated .hero-beats {
+  max-width: var(--container);
+  margin: 0 auto;
   gap: 0;
 }
 
 .hero-animated .beat {
   grid-area: 1 / 1;
-  align-self: center;
+  align-self: end;
+  max-width: 34rem;
   opacity: 0;
+  visibility: hidden;
   will-change: opacity, transform;
 }
 
@@ -341,13 +387,13 @@ body {
   display: block;
   position: absolute;
   left: 50%;
-  bottom: 1.75rem;
+  bottom: 1.5rem;
   z-index: 1;
-  transform: translateX(-50%);
   margin: 0;
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 0.95rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
   color: var(--text-muted);
   animation: cueDrift 2.4s var(--ease-in-out) infinite;
 }
@@ -359,9 +405,9 @@ body {
 
 @media (max-width: 860px) {
   .hero {
-    align-items: flex-end;
     padding-top: calc(4.5rem + 75vw);
-    background-image: url("../media/hero/mobile/159.webp");
+    padding-bottom: 4rem;
+    background-image: url("../media/hero/mobile/webp/113.webp");
     background-size: 100% auto;
     background-position: center 4.5rem;
   }
@@ -374,14 +420,16 @@ body {
   }
 
   .hero-shade {
-    background: linear-gradient(180deg, rgba(17, 12, 7, 0) 30%, rgba(17, 12, 7, 0.75) 55%, var(--bg-main) 70%);
+    background: linear-gradient(180deg, rgba(17, 12, 7, 0.5) 0, rgba(17, 12, 7, 0) 4.5rem, rgba(17, 12, 7, 0) calc(4.5rem + 55vw), var(--bg-main) calc(4.5rem + 75vw));
   }
 
-  .hero-content {
+  .hero-content,
+  .hero-animated .hero-content {
     text-align: center;
   }
 
-  .hero-beats {
+  .hero-beats,
+  .hero-animated .beat {
     margin: 0 auto;
   }
 
@@ -389,21 +437,24 @@ body {
     justify-content: center;
   }
 
-  .hero-desc,
   .beat-desc {
     margin: 0 auto;
   }
 
   .hero-animated {
-    height: 360vh;
+    height: 420vh;
   }
 
   .hero-animated .hero {
-    padding-top: calc(4.5rem + 75vw);
-    padding-bottom: 3.5rem;
-    background-image: url("../media/hero/mobile/000.webp");
+    padding: 0;
+    background-image: url("../media/hero/mobile/webp/000.webp");
     background-size: 100% auto;
     background-position: center 4.5rem;
+  }
+
+  .hero-animated .hero-content {
+    top: calc(4.5rem + 75vw + 2rem);
+    bottom: auto;
   }
 
   .hero-animated .beat {
@@ -462,7 +513,7 @@ body {
 .statement {
   text-wrap: balance;
   font-family: var(--font-serif);
-  font-weight: 600;
+  font-weight: 400;
   font-size: clamp(2rem, 4.5vw, 3.1rem);
   line-height: 1.12;
   letter-spacing: -0.01em;
@@ -477,16 +528,6 @@ body {
   margin: 0 auto;
 }
 
-.numeral {
-  display: block;
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 500;
-  font-size: 1.15rem;
-  color: var(--accent);
-  margin-bottom: 0.6rem;
-}
-
 /* Laburo */
 .flagship-meta {
   display: flex;
@@ -499,7 +540,7 @@ body {
 
 .flagship-name {
   font-family: var(--font-serif);
-  font-weight: 600;
+  font-weight: 400;
   font-size: clamp(2.5rem, 6vw, 4rem);
   letter-spacing: -0.01em;
   margin: 0 0 1.25rem;
