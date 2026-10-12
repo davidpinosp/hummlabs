@@ -46,7 +46,6 @@
         </span>
       </button>
       <nav class="nav" id="site-nav">
-        <a href="#mission" class="nav-link" data-i18n="nav_mission">What we believe</a>
         <a href="#hummingbird" class="nav-link" data-i18n="nav_bird">Hummingbird</a>
         <a href="#laburo" class="nav-link" data-i18n="nav_laburo">Laburo</a>
         <div class="lang-toggle" role="group" aria-label="Language">
@@ -58,165 +57,36 @@
   </header>
 
   <main>
-    <section class="hero-pin">
+    <section class="hero-pin" id="top">
       <div class="hero">
-        <div class="hero-bg">
-          <div class="hero-glow"></div>
-        </div>
+        <canvas class="hero-canvas" aria-hidden="true"></canvas>
+        <div class="hero-shade" aria-hidden="true"></div>
         <div class="hero-content">
-          <div class="hero-text">
-            <p class="hero-label reveal" data-i18n="hero_label">Idea Lab</p>
-            <h1 class="hero-title reveal" data-i18n="hero_title">We build, acquire, scale, and operate innovative ventures.</h1>
-            <p class="hero-desc reveal" data-i18n="hero_desc">Humm Labs is an idea lab. We create things that shape our surroundings and help them flourish.</p>
-          </div>
-          <div class="hero-art">
-            <svg id="automatonSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 20 460 300" role="img" aria-labelledby="automatonTitle">
-              <title id="automatonTitle">A gold automaton hummingbird, assembling as you scroll</title>
-              <defs>
-                <radialGradient id="haloGlow" cx="50%" cy="46%" r="62%">
-                  <stop offset="0%" stop-color="#f3cf8c" stop-opacity="0.32" />
-                  <stop offset="45%" stop-color="#caa15a" stop-opacity="0.11" />
-                  <stop offset="100%" stop-color="#caa15a" stop-opacity="0" />
-                </radialGradient>
-                <linearGradient id="bodyGrad" x1="15%" y1="8%" x2="85%" y2="95%">
-                  <stop offset="0%" stop-color="#f7e3ab" />
-                  <stop offset="38%" stop-color="#d9ac55" />
-                  <stop offset="72%" stop-color="#a8762f" />
-                  <stop offset="100%" stop-color="#7a5420" />
-                </linearGradient>
-                <linearGradient id="wingGrad" x1="10%" y1="0%" x2="95%" y2="100%">
-                  <stop offset="0%" stop-color="#f8ecc8" stop-opacity="0.95" />
-                  <stop offset="42%" stop-color="#e3b36a" stop-opacity="0.9" />
-                  <stop offset="70%" stop-color="#cf8f74" stop-opacity="0.82" />
-                  <stop offset="100%" stop-color="#8f6a35" stop-opacity="0.78" />
-                </linearGradient>
-                <linearGradient id="beakGrad" x1="0%" y1="0%" x2="100%" y2="60%">
-                  <stop offset="0%" stop-color="#e9c17a" />
-                  <stop offset="100%" stop-color="#6b4a1f" />
-                </linearGradient>
-                <linearGradient id="gearGrad" x1="10%" y1="0%" x2="90%" y2="100%">
-                  <stop offset="0%" stop-color="#fbe9bd" />
-                  <stop offset="55%" stop-color="#c6953f" />
-                  <stop offset="100%" stop-color="#7c551f" />
-                </linearGradient>
-                <path id="bodyPath" d="M330 195 C345 170 335 148 300 143 C255 138 195 150 160 175 C125 192 125 200 160 215 C205 230 235 250 248 265 C268 280 300 265 312 240 C322 222 328 208 330 195 Z" />
-                <clipPath id="bodyClip"><use href="#bodyPath" /></clipPath>
-              </defs>
-
-              <circle cx="245" cy="185" r="185" fill="url(#haloGlow)" />
-
-              <!-- Draft / blueprint layer: the da Vinci schematic beneath the finished piece -->
-              <g id="autoDraft">
-                <g fill="none" stroke="#e7dcc3" stroke-width="1.1" stroke-opacity="0.55" stroke-dasharray="3 3">
-                  <path d="M300 150 C260 110 220 80 170 70 C205 100 235 120 255 140 C272 150 288 152 300 150 Z" />
-                  <path d="M160 206 C102 201 58 201 28 207 C58 214 102 214 160 216 Z" />
-                  <use href="#bodyPath" />
-                  <path d="M330 184 C368 183 400 196 422 213 C398 201 362 196 330 206 Z" />
-                  <circle cx="323" cy="177" r="6" />
-                </g>
-                <g fill="none" stroke="#e7dcc3" stroke-width="0.8" stroke-opacity="0.4">
-                  <path d="M422 213 L28 207" stroke-dasharray="1 5" />
-                  <circle cx="300" cy="150" r="3" />
-                  <circle cx="160" cy="206" r="3" />
-                  <circle cx="330" cy="196" r="3" />
-                  <circle cx="276" cy="236" r="3" />
-                  <g stroke-opacity="0.55">
-                    <path d="M170 64 L170 76 M164 70 L176 70" />
-                    <path d="M24 201 L24 213 M18 207 L30 207" />
-                    <path d="M428 207 L428 219 M422 213 L434 213" />
-                  </g>
-                  <path d="M160 288 L330 288 M160 282 L160 294 M330 282 L330 294" />
-                </g>
-              </g>
-
-              <g id="partWingEcho" class="assembly-part">
-                <g opacity="0.14" transform="rotate(22 300 150)"><path d="M300 150 C260 110 220 80 170 70 C205 100 235 120 255 140 C272 150 288 152 300 150 Z" fill="#e8c27e" /></g>
-                <g opacity="0.3" transform="rotate(11 300 150)"><path d="M300 150 C260 110 220 80 170 70 C205 100 235 120 255 140 C272 150 288 152 300 150 Z" fill="#e8c27e" /></g>
-              </g>
-
-              <g id="partTail" class="assembly-part" fill="url(#wingGrad)" stroke="#3a2a12" stroke-width="1.3">
-                <path d="M160 188 C112 168 72 160 42 167 C77 180 117 190 160 198 Z" opacity="0.8" />
-                <path d="M160 206 C102 201 58 201 28 207 C58 214 102 214 160 216 Z" opacity="0.68" />
-                <path d="M160 221 C117 233 80 245 50 259 C82 241 120 227 160 229 Z" opacity="0.52" />
-              </g>
-
-              <g id="partWing" class="assembly-part">
-                <path d="M300 150 C260 110 220 80 170 70 C205 100 235 120 255 140 C272 150 288 152 300 150 Z" fill="url(#wingGrad)" stroke="#3a2a12" stroke-width="1.4" />
-                <path d="M250 112 C235 100 218 92 203 88" fill="none" stroke="#f7e3ab" stroke-width="0.9" opacity="0.4" />
-                <path d="M262 128 C245 112 226 100 208 94" fill="none" stroke="#3a2a12" stroke-width="0.8" opacity="0.35" />
-              </g>
-
-              <g id="partBody" class="assembly-part">
-                <use href="#bodyPath" fill="url(#bodyGrad)" stroke="#3a2a12" stroke-width="2.5" />
-              </g>
-
-              <g id="partBeak" class="assembly-part">
-                <path d="M330 184 C368 183 400 196 422 213 C398 201 362 196 330 206 Z" fill="url(#beakGrad)" stroke="#3a2a12" stroke-width="2.4" stroke-linejoin="round" />
-              </g>
-
-              <g id="partHatch" class="assembly-part" clip-path="url(#bodyClip)">
-                <path d="M195 160 C213 178 226 202 231 230" fill="none" stroke="#f7e3ab" stroke-width="1" opacity="0.32" />
-                <path d="M175 220 C195 232 212 248 222 262" fill="none" stroke="#5b3f1a" stroke-width="1" opacity="0.28" />
-              </g>
-
-              <g id="partAxles" class="assembly-part" clip-path="url(#bodyClip)">
-                <line x1="276" y1="226" x2="236" y2="258" stroke="#3a2a12" stroke-width="2.6" stroke-linecap="round" />
-                <line x1="276" y1="226" x2="305" y2="246" stroke="#3a2a12" stroke-width="2.6" stroke-linecap="round" />
-              </g>
-
-              <g clip-path="url(#bodyClip)">
-                <g id="partGear1" class="assembly-part assembly-gear">
-                  <path d="M308 226 L297.87 233.11 L301.89 244.81 L289.52 244.61 L285.89 256.43 L276 249 L266.11 256.43 L262.48 244.61 L250.11 244.81 L254.13 233.11 L244 226 L254.13 218.89 L250.11 207.19 L262.48 207.39 L266.11 195.57 L276 203 L285.89 195.57 L289.52 207.39 L301.89 207.19 L297.87 218.89 Z" fill="url(#gearGrad)" stroke="#3a2a12" stroke-width="1.4" stroke-linejoin="round" />
-                  <circle cx="276" cy="226" r="5.5" fill="#3a2a12" />
-                </g>
-                <g id="partGear2" class="assembly-part assembly-gear">
-                  <path d="M253.61 261.74 L246.71 265.36 L245.8 273.1 L238.37 270.78 L232.26 275.61 L228.64 268.71 L220.9 267.8 L223.22 260.37 L218.39 254.26 L225.29 250.64 L226.2 242.9 L233.63 245.22 L239.74 240.39 L243.36 247.29 L251.1 248.2 L248.78 255.63 Z" fill="url(#gearGrad)" stroke="#3a2a12" stroke-width="1.2" stroke-linejoin="round" />
-                  <circle cx="236" cy="258" r="3.4" fill="#3a2a12" />
-                </g>
-                <g id="partGear3" class="assembly-part assembly-gear">
-                  <path d="M316.95 247.05 L311.88 250.09 L311.64 256 L306.09 253.92 L301.32 257.42 L299.49 251.8 L293.78 250.24 L297.03 245.3 L294.68 239.87 L300.58 239.33 L303.36 234.11 L307.45 238.39 L313.27 237.31 L312.48 243.17 Z" fill="url(#gearGrad)" stroke="#3a2a12" stroke-width="1.1" stroke-linejoin="round" />
-                  <circle cx="305" cy="246" r="2.3" fill="#3a2a12" />
-                </g>
-              </g>
-
-              <g id="partKey" class="assembly-part">
-                <line x1="314" y1="146" x2="298" y2="100" stroke="url(#beakGrad)" stroke-width="4.5" stroke-linecap="round" />
-                <circle cx="294" cy="90" r="13" fill="none" stroke="url(#beakGrad)" stroke-width="4.5" />
-              </g>
-
-              <g id="partEye" class="assembly-part">
-                <circle cx="323" cy="177" r="6" fill="#2a1d0c" />
-                <circle cx="325" cy="175" r="1.8" fill="#f7e3ab" />
-              </g>
-            </svg>
+          <div class="hero-beats">
+            <div class="beat" data-start="0" data-end="0.17">
+              <p class="hero-label" data-i18n="hero_label">Idea Lab</p>
+              <h1 class="hero-title" data-i18n="hero_title">We build, acquire, scale, and operate innovative ventures.</h1>
+              <p class="hero-desc" data-i18n="hero_desc">Humm Labs is an idea lab. We create things that shape our surroundings and help them flourish.</p>
+            </div>
+            <div class="beat" data-start="0.21" data-end="0.4">
+              <span class="numeral" aria-hidden="true">I</span>
+              <h2 class="beat-title" data-i18n="value_1_title">Invent</h2>
+              <p class="beat-desc" data-i18n="value_1_desc">We started Humm Labs to invent. We’d rather make something new than repeat what already exists.</p>
+            </div>
+            <div class="beat" data-start="0.46" data-end="0.72">
+              <span class="numeral" aria-hidden="true">II</span>
+              <h2 class="beat-title" data-i18n="value_2_title">Do it well</h2>
+              <p class="beat-desc" data-i18n="value_2_desc">Care in the details. We build companies that create real value and are made to last.</p>
+            </div>
+            <div class="beat" data-start="0.8" data-end="1">
+              <span class="numeral" aria-hidden="true">III</span>
+              <h2 class="beat-title" data-i18n="value_3_title">Help it flourish</h2>
+              <p class="beat-desc" data-i18n="value_3_desc">Good companies lift everyone around them: teams, customers, communities.</p>
+            </div>
           </div>
         </div>
+        <p class="hero-scroll-cue" aria-hidden="true" data-i18n="scroll_cue">Scroll</p>
       </div>
-    </section>
-
-    <section class="section" id="mission">
-      <div class="section-intro reveal">
-        <span class="eyebrow" data-i18n="mission_eyebrow">What we believe</span>
-        <h2 class="statement" data-i18n="mission_title">Create, and help things grow.</h2>
-        <p class="lead" data-i18n="mission_body">We started Humm Labs to invent. We build companies that create real value, and we want everything we make to leave the people and places around it better off.</p>
-      </div>
-      <ol class="steps">
-        <li class="step reveal">
-          <span class="numeral" aria-hidden="true">I</span>
-          <h3 data-i18n="step_1_title">Invent</h3>
-          <p data-i18n="step_1_desc">We’d rather make something new than repeat what already exists.</p>
-        </li>
-        <li class="step reveal">
-          <span class="numeral" aria-hidden="true">II</span>
-          <h3 data-i18n="step_2_title">Do it well</h3>
-          <p data-i18n="step_2_desc">Care in the details. We build things meant to last.</p>
-        </li>
-        <li class="step reveal">
-          <span class="numeral" aria-hidden="true">III</span>
-          <h3 data-i18n="step_3_title">Help it flourish</h3>
-          <p data-i18n="step_3_desc">Good companies lift everyone around them: teams, customers, communities.</p>
-        </li>
-      </ol>
     </section>
 
     <section class="section" id="hummingbird">

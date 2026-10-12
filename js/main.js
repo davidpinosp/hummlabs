@@ -6,21 +6,11 @@
   var translations = {
     en: {
       logo: "Humm Labs",
-      nav_mission: "What we believe",
       nav_bird: "Hummingbird",
       nav_laburo: "Laburo",
       hero_label: "Idea Lab",
       hero_title: "We build, acquire, scale, and operate innovative ventures.",
       hero_desc: "Humm Labs is an idea lab. We create things that shape our surroundings and help them flourish.",
-      mission_eyebrow: "What we believe",
-      mission_title: "Create, and help things grow.",
-      mission_body: "We started Humm Labs to invent. We build companies that create real value, and we want everything we make to leave the people and places around it better off.",
-      step_1_title: "Invent",
-      step_1_desc: "We’d rather make something new than repeat what already exists.",
-      step_2_title: "Do it well",
-      step_2_desc: "Care in the details. We build things meant to last.",
-      step_3_title: "Help it flourish",
-      step_3_desc: "Good companies lift everyone around them: teams, customers, communities.",
       bird_eyebrow: "Why the hummingbird",
       bird_title: "A small bird with a large effect.",
       bird_intro: "The hummingbird is our family’s animal. It never stops moving, and as it travels from flower to flower, the whole garden grows. That’s how we want to work.",
@@ -30,25 +20,22 @@
       laburo_cta: "Visit Laburo",
       next_teaser: "More ideas are taking shape.",
       meta_home_title: "Humm Labs — Idea Lab",
-      meta_home_desc: "Humm Labs is an idea lab. We build, acquire, scale, and operate innovative ventures. Our first project is Laburo, the AI hiring operating system for LatAm."
+      meta_home_desc: "Humm Labs is an idea lab. We build, acquire, scale, and operate innovative ventures. Our first project is Laburo, the AI hiring operating system for LatAm.",
+      value_1_title: "Invent",
+      value_1_desc: "We started Humm Labs to invent. We’d rather make something new than repeat what already exists.",
+      value_2_title: "Do it well",
+      value_2_desc: "Care in the details. We build companies that create real value and are made to last.",
+      value_3_title: "Help it flourish",
+      value_3_desc: "Good companies lift everyone around them: teams, customers, communities.",
+      scroll_cue: "Scroll"
     },
     es: {
       logo: "Humm Labs",
-      nav_mission: "En qué creemos",
       nav_bird: "Colibrí",
       nav_laburo: "Laburo",
       hero_label: "Idea Lab",
       hero_title: "Construimos, adquirimos, escalamos y operamos empresas innovadoras.",
       hero_desc: "Humm Labs es un idea lab. Creamos cosas que dan forma a nuestro entorno y lo ayudan a florecer.",
-      mission_eyebrow: "En qué creemos",
-      mission_title: "Crear, y ayudar a que las cosas crezcan.",
-      mission_body: "Empezamos Humm Labs para inventar. Construimos empresas que crean valor real, y queremos que todo lo que hacemos deje mejor a las personas y los lugares que lo rodean.",
-      step_1_title: "Inventar",
-      step_1_desc: "Preferimos hacer algo nuevo antes que repetir lo que ya existe.",
-      step_2_title: "Hacerlo bien",
-      step_2_desc: "Cuidado en los detalles. Construimos cosas hechas para durar.",
-      step_3_title: "Ayudar a florecer",
-      step_3_desc: "Las buenas empresas elevan a todos a su alrededor: equipos, clientes, comunidades.",
       bird_eyebrow: "Por qué el colibrí",
       bird_title: "Un ave pequeña con un gran efecto.",
       bird_intro: "El colibrí es el animal de nuestra familia. Nunca deja de moverse, y mientras va de flor en flor, todo el jardín crece. Así queremos trabajar.",
@@ -58,7 +45,14 @@
       laburo_cta: "Visitar Laburo",
       next_teaser: "Más ideas están tomando forma.",
       meta_home_title: "Humm Labs — Idea Lab",
-      meta_home_desc: "Humm Labs es un idea lab. Construimos, adquirimos, escalamos y operamos empresas innovadoras. Nuestro primer proyecto es Laburo, el sistema operativo de contratación con IA para LatAm."
+      meta_home_desc: "Humm Labs es un idea lab. Construimos, adquirimos, escalamos y operamos empresas innovadoras. Nuestro primer proyecto es Laburo, el sistema operativo de contratación con IA para LatAm.",
+      value_1_title: "Inventar",
+      value_1_desc: "Empezamos Humm Labs para inventar. Preferimos hacer algo nuevo antes que repetir lo que ya existe.",
+      value_2_title: "Hacerlo bien",
+      value_2_desc: "Cuidado en los detalles. Construimos empresas que crean valor real y están hechas para durar.",
+      value_3_title: "Ayudar a florecer",
+      value_3_desc: "Las buenas empresas elevan a todos a su alrededor: equipos, clientes, comunidades.",
+      scroll_cue: "Desliza"
     }
   };
 
@@ -236,95 +230,179 @@
     });
   }
 
-  function initAutomatonAssembly() {
+  function initHeroSequence() {
     var pin = document.querySelector('.hero-pin');
-    var svg = document.getElementById('automatonSvg');
-    if (!pin || !svg) return;
-
-    var draft = document.getElementById('autoDraft');
-    var parts = [
-      { id: 'partWingEcho', start: 0.18, end: 0.38, kind: 'fade' },
-      { id: 'partTail', start: 0.38, end: 0.58, kind: 'settle' },
-      { id: 'partBeak', start: 0.48, end: 0.66, kind: 'settle' },
-      { id: 'partWing', start: 0.26, end: 0.48, kind: 'settle' },
-      { id: 'partBody', start: 0.04, end: 0.3, kind: 'settle' },
-      { id: 'partHatch', start: 0.15, end: 0.35, kind: 'fade' },
-      { id: 'partAxles', start: 0.58, end: 0.7, kind: 'fade' },
-      { id: 'partGear1', start: 0.6, end: 0.76, kind: 'gear' },
-      { id: 'partGear2', start: 0.66, end: 0.81, kind: 'gear' },
-      { id: 'partGear3', start: 0.72, end: 0.86, kind: 'gear' },
-      { id: 'partKey', start: 0.8, end: 0.94, kind: 'settle' },
-      { id: 'partEye', start: 0.9, end: 1, kind: 'pop' }
-    ].map(function (p) {
-      p.el = document.getElementById(p.id);
-      return p;
-    }).filter(function (p) { return p.el; });
+    var canvas = pin && pin.querySelector('.hero-canvas');
+    if (!canvas || !canvas.getContext) return;
 
     var reducedMotion = false;
     try {
       reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     } catch (e) {}
+    if (reducedMotion) return;
 
-    function easeOutCubic(t) {
-      return 1 - Math.pow(1 - t, 3);
+    var FRAME_COUNT = 160;
+    var mobileQuery = window.matchMedia('(max-width: 860px)');
+    var ctx = canvas.getContext('2d');
+    var cue = pin.querySelector('.hero-scroll-cue');
+    var beats = Array.prototype.map.call(pin.querySelectorAll('.beat'), function (el, i, all) {
+      return {
+        el: el,
+        start: parseFloat(el.getAttribute('data-start')),
+        end: parseFloat(el.getAttribute('data-end')),
+        first: i === 0,
+        last: i === all.length - 1
+      };
+    });
+
+    var frames = [];
+    var set = '';
+    var progress = 0;
+    var drawnIndex = -1;
+    var drawnSet = '';
+
+    pin.classList.add('hero-animated');
+
+    function framePath(i) {
+      return 'media/hero/' + set + '/' + ('00' + i).slice(-3) + '.webp';
     }
 
-    function applyFinal() {
-      parts.forEach(function (p) {
-        p.el.style.opacity = 1;
-        p.el.style.transform = 'none';
+    // Coarse-to-fine: first and last frames, then every 16th, 8th, ... so the
+    // whole timeline is scrubbable almost immediately and sharpens as it loads.
+    function loadOrder() {
+      var order = [0, FRAME_COUNT - 1];
+      var seen = {};
+      seen[0] = seen[FRAME_COUNT - 1] = true;
+      [16, 8, 4, 2, 1].forEach(function (step) {
+        for (var i = 0; i < FRAME_COUNT; i += step) {
+          if (!seen[i]) {
+            seen[i] = true;
+            order.push(i);
+          }
+        }
       });
-      if (draft) draft.style.opacity = 0.12;
+      return order;
     }
 
-    if (reducedMotion) {
-      applyFinal();
-      return;
+    function loadFrames() {
+      var nextSet = mobileQuery.matches ? 'mobile' : 'desktop';
+      if (nextSet === set) return;
+      set = nextSet;
+      frames = new Array(FRAME_COUNT);
+      var queue = loadOrder();
+      var active = 0;
+      var token = set;
+
+      function pump() {
+        while (active < 6 && queue.length) {
+          var i = queue.shift();
+          var img = new Image();
+          active++;
+          img.onload = img.onerror = (function (index, image) {
+            return function (event) {
+              active--;
+              if (token !== set) return;
+              if (event.type === 'load') {
+                frames[index] = image;
+                drawnIndex = -1;
+                schedule();
+              }
+              pump();
+            };
+          })(i, img);
+          img.src = framePath(i);
+        }
+      }
+      pump();
     }
 
-    function applyPart(p, progress) {
-      var local = (progress - p.start) / (p.end - p.start);
-      local = Math.max(0, Math.min(1, local));
-      var eased = easeOutCubic(local);
-      p.el.style.opacity = eased;
+    function nearestLoaded(target) {
+      for (var offset = 0; offset < FRAME_COUNT; offset++) {
+        if (frames[target - offset]) return target - offset;
+        if (frames[target + offset]) return target + offset;
+      }
+      return -1;
+    }
 
-      if (p.kind === 'settle') {
-        var translate = (1 - eased) * 16;
-        var scale = 0.94 + eased * 0.06;
-        p.el.style.transform = 'translateY(' + translate + 'px) scale(' + scale + ')';
-      } else if (p.kind === 'gear') {
-        var deg = (1 - eased) * -65;
-        p.el.style.transform = 'rotate(' + deg + 'deg)';
-      } else if (p.kind === 'pop') {
-        var s = 0.3 + eased * 0.7;
-        p.el.style.transform = 'scale(' + s + ')';
+    function resizeCanvas() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var w = Math.round(canvas.clientWidth * dpr);
+      var h = Math.round(canvas.clientHeight * dpr);
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+        drawnIndex = -1;
       }
     }
 
-    function update() {
+    function drawFrame(index) {
+      var img = frames[index];
+      var cw = canvas.width;
+      var ch = canvas.height;
+      var scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
+      var w = img.naturalWidth * scale;
+      var h = img.naturalHeight * scale;
+      // When the viewport is narrower than the frame, crop mostly from the empty left side.
+      var x = (cw - w) * (set === 'desktop' ? 0.35 : 0.5);
+      var y = (ch - h) * 0.5;
+      ctx.fillStyle = '#110c07';
+      ctx.fillRect(0, 0, cw, ch);
+      ctx.drawImage(img, x, y, w, h);
+    }
+
+    function smoothstep(a, b, v) {
+      var t = Math.max(0, Math.min(1, (v - a) / (b - a)));
+      return t * t * (3 - 2 * t);
+    }
+
+    function updateBeats() {
+      var fade = 0.05;
+      beats.forEach(function (b) {
+        var fadeIn = b.first ? 1 : smoothstep(b.start, b.start + fade, progress);
+        var fadeOut = b.last ? 1 : 1 - smoothstep(b.end - fade, b.end, progress);
+        var o = Math.min(fadeIn, fadeOut);
+        b.el.style.opacity = o;
+        b.el.style.transform = 'translateY(' + ((1 - o) * (progress < b.start + fade ? 14 : -14)) + 'px)';
+        b.el.style.visibility = o < 0.01 ? 'hidden' : 'visible';
+      });
+      if (cue) cue.style.opacity = 1 - smoothstep(0, 0.03, progress);
+    }
+
+    function render() {
+      ticking = false;
       var rect = pin.getBoundingClientRect();
       var scrollable = pin.offsetHeight - window.innerHeight;
-      var progress = scrollable > 0 ? -rect.top / scrollable : 0;
-      progress = Math.max(0, Math.min(1, progress));
+      progress = scrollable > 0 ? Math.max(0, Math.min(1, -rect.top / scrollable)) : 0;
 
-      parts.forEach(function (p) { applyPart(p, progress); });
-      if (draft) draft.style.opacity = 1 - progress * 0.88;
+      updateBeats();
+      resizeCanvas();
+      var target = Math.round(progress * (FRAME_COUNT - 1));
+      var index = nearestLoaded(target);
+      if (index >= 0 && (index !== drawnIndex || drawnSet !== set)) {
+        drawFrame(index);
+        drawnIndex = index;
+        drawnSet = set;
+      }
     }
 
     var ticking = false;
-    function onScroll() {
+    function schedule() {
       if (!ticking) {
-        requestAnimationFrame(function () {
-          update();
-          ticking = false;
-        });
         ticking = true;
+        requestAnimationFrame(render);
       }
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
-    update();
+    function onResize() {
+      loadFrames();
+      drawnIndex = -1;
+      schedule();
+    }
+
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', onResize);
+    loadFrames();
+    schedule();
   }
 
   function init() {
@@ -332,7 +410,7 @@
     initHeaderScroll();
     initMobileNav();
     initReveals();
-    initAutomatonAssembly();
+    initHeroSequence();
   }
 
   if (document.readyState === 'loading') {
