@@ -183,13 +183,13 @@
     var FRAME_COUNT = 114;
     var DRAWING_END = 33;
     var LAST = FRAME_COUNT - 1;
-    // Scroll progress -> frame. The flat segments hold the image still while a
-    // statement passes; these points line up with each statement's --at.
+    // Scroll progress -> frame. The flat segments hold the image still: on the
+    // first sketch, on the finished drawing, and on the finished automaton.
     var TIMELINE = [
-      { to: 0.12, from: 0, until: 0 },
-      { to: 0.36, from: 0, until: DRAWING_END },
+      { to: 0.06, from: 0, until: 0 },
+      { to: 0.32, from: 0, until: DRAWING_END },
       { to: 0.5, from: DRAWING_END, until: DRAWING_END },
-      { to: 0.88, from: DRAWING_END, until: LAST },
+      { to: 0.86, from: DRAWING_END, until: LAST },
       { to: 1, from: LAST, until: LAST }
     ];
     var AVIF_PROBE = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAAD5bWV0YQAAAAAAAAAvaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAFBpY3R1cmVIYW5kbGVyAAAAAA5waXRtAAAAAAABAAAAHmlsb2MAAAAARAAAAQABAAAAAQAAASEAAAAUAAAAKGlpbmYAAAAAAAEAAAAaaW5mZQIAAAAAAQAAYXYwMUNvbG9yAAAAAGppcHJwAAAAS2lwY28AAAAUaXNwZQAAAAAAAAACAAAAAgAAABBwaXhpAAAAAAMICAgAAAAMYXYxQ4EADAAAAAATY29scm5jbHgAAgACAAIAAAAAF2lwbWEAAAAAAAAAAQABBAECgwQAAAAcbWRhdAoFGAA2wCAyCx/wAABYAAAAAK8w';
@@ -197,7 +197,13 @@
     var mobileQuery = window.matchMedia('(max-width: 860px)');
     var ctx = canvas.getContext('2d');
     var cue = pin.querySelector('.hero-scroll-cue');
-    var beats = Array.prototype.slice.call(pin.querySelectorAll('.beat'));
+    function range(el, name) {
+      var value = el.getAttribute(name);
+      return value ? value.split(' ').map(parseFloat) : null;
+    }
+    var beats = Array.prototype.map.call(pin.querySelectorAll('.beat'), function (el) {
+      return { el: el, enter: range(el, 'data-in'), exit: range(el, 'data-out') };
+    });
 
     var format = null;
     var frames = [];
@@ -334,19 +340,30 @@
       return t * t * (3 - 2 * t);
     }
 
-    // Statements scroll with the page; they fade in near the bottom of the
-    // screen and out near the top (on phones, before they reach the image).
-    function updateBeats() {
-      var vh = window.innerHeight;
-      var topEdge = mobileQuery.matches ? canvas.getBoundingClientRect().bottom : vh * 0.08;
-      var topRange = mobileQuery.matches ? vh * 0.1 : vh * 0.2;
-      beats.forEach(function (el) {
-        var r = el.getBoundingClientRect();
-        var fadeIn = 1 - smoothstep(vh * 0.86, vh, r.bottom);
-        var fadeOut = smoothstep(topEdge, topEdge + topRange, r.top);
-        var o = Math.min(fadeIn, fadeOut);
-        el.style.opacity = o.toFixed(3);
-        el.style.visibility = o < 0.01 ? 'hidden' : 'visible';
+    function clamp01(v) {
+      return Math.max(0, Math.min(1, v));
+    }
+
+    // Each statement scrolls in, sticks while the animation plays behind it,
+    // then scrolls out. Movement follows the scroll, easing into and out of the
+    // resting point, so it reads like the page itself pausing.
+    function updateBeats(progress) {
+      var travel = window.innerHeight * (mobileQuery.matches ? 0.16 : 0.32);
+      beats.forEach(function (b) {
+        var offset = 0;
+        var opacity = 1;
+        if (b.enter && progress < b.enter[1]) {
+          var tin = clamp01((progress - b.enter[0]) / (b.enter[1] - b.enter[0]));
+          offset = Math.pow(1 - tin, 3) * travel;
+          opacity = smoothstep(0, 0.75, tin);
+        } else if (b.exit && progress > b.exit[0]) {
+          var tout = clamp01((progress - b.exit[0]) / (b.exit[1] - b.exit[0]));
+          offset = -Math.pow(tout, 3) * travel;
+          opacity = 1 - smoothstep(0.25, 1, tout);
+        }
+        b.el.style.opacity = opacity.toFixed(3);
+        b.el.style.transform = 'translate3d(0, ' + offset.toFixed(1) + 'px, 0) translateY(-50%)';
+        b.el.style.visibility = opacity < 0.01 ? 'hidden' : 'visible';
       });
     }
 
@@ -356,7 +373,7 @@
       var scrollable = pin.offsetHeight - window.innerHeight;
       var progress = scrollable > 0 ? Math.max(0, Math.min(1, -rect.top / scrollable)) : 0;
 
-      updateBeats();
+      updateBeats(progress);
       if (cue) cue.style.opacity = 1 - smoothstep(0, 0.04, progress);
       if (!format) return;
       resizeCanvas();

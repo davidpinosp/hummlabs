@@ -269,9 +269,10 @@ body {
 /* ========== Hero ==========
    Default (no JS / reduced motion): the finished automaton with the three
    statements over it. With .hero-animated the screen pins while a canvas
-   scrubs the sketch-to-automaton frames, and the statements scroll past it in a
-   layer that moves with the page. --run is how far the page scrolls while the
-   screen is pinned; each statement crosses its resting height --y at --at. */
+   scrubs the sketch-to-automaton frames. Each statement scrolls in, sticks at
+   its resting height --y while the animation plays, then scrolls out; the
+   script drives that from the data-in / data-out ranges. --run is how far the
+   page scrolls while the screen is pinned. */
 .hero-pin {
   position: relative;
 }
@@ -362,7 +363,7 @@ body {
 
 /* Scroll-driven mode */
 .hero-animated {
-  --run: 400vh;
+  --run: 340vh;
   height: calc(100vh + var(--run));
 }
 
@@ -394,10 +395,10 @@ body {
 .hero-animated .beat {
   position: absolute;
   left: 0;
-  top: calc(var(--at) * var(--run) + var(--y));
+  top: var(--y);
   transform: translateY(-50%);
   opacity: 0;
-  will-change: opacity;
+  will-change: opacity, transform;
 }
 
 .hero-animated .hero-scroll-cue {
@@ -437,8 +438,8 @@ body {
   }
 
   .hero-content {
-    position: static;
-    padding: 2rem 0 3rem;
+    position: relative;
+    padding: calc(75vw + 2rem) 0 3rem;
     text-align: center;
   }
 
@@ -455,7 +456,7 @@ body {
   }
 
   .hero-animated {
-    --run: 320vh;
+    --run: 300vh;
   }
 
   .hero-animated .hero {
@@ -470,7 +471,7 @@ body {
   .hero-animated .beat {
     left: 0;
     right: 0;
-    top: calc(var(--at) * var(--run) + 70vh);
+    top: 70vh;
   }
 
   .hero-animated .hero-scroll-cue {
