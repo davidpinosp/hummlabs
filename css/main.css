@@ -80,8 +80,21 @@
   box-sizing: border-box;
 }
 
-html {
+html:not(.lenis) {
   scroll-behavior: smooth;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
 }
 
 body {
@@ -145,64 +158,51 @@ body {
   50% { opacity: 0.45; }
 }
 
-/* ========== Header ========== */
+/* ========== Header ==========
+   Floats over the hero with no background, so the animation fills the screen. */
 .header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
-  padding: 1.25rem 0;
-  background: linear-gradient(to bottom, var(--bg-main) 0%, transparent 100%);
-  transition: background var(--duration-fast) var(--ease-out);
-}
-
-.header.scrolled {
-  background: rgba(17, 12, 7, 0.85);
-  backdrop-filter: blur(12px);
+  padding: 1.5rem 0;
+  pointer-events: none;
 }
 
 .header-inner {
   max-width: var(--container);
   margin: 0 auto;
-  padding: 0 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  pointer-events: auto;
 }
 
 .logo {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   text-decoration: none;
-  transition: opacity var(--duration-fast), transform var(--duration-fast);
-}
-
-.logo:hover .logo-text {
-  color: var(--accent);
-}
-
-.logo:hover {
-  opacity: 1;
-  transform: translateY(-1px);
 }
 
 .logo-img {
   display: block;
-  height: 40px;
+  height: 26px;
   width: auto;
-  object-fit: contain;
-  flex-shrink: 0;
+  opacity: 0.92;
 }
 
 .logo-text {
   font-family: var(--font-serif);
   font-weight: 400;
-  font-size: 1.55rem;
-  letter-spacing: 0;
+  font-size: 1.3rem;
   color: var(--text-primary);
   transition: color var(--duration-fast);
+}
+
+.logo:hover .logo-text {
+  color: var(--accent);
 }
 
 .nav {
@@ -211,62 +211,74 @@ body {
   gap: 2rem;
 }
 
-.nav-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: var(--text-secondary);
+.nav-link,
+.lang-btn {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   text-decoration: none;
-  transition: color var(--duration-fast), transform var(--duration-fast);
+  color: var(--text-secondary);
+  transition: color var(--duration-fast);
 }
 
 .nav-link:hover {
   color: var(--text-primary);
-  transform: translateY(-1px);
 }
 
 .lang-toggle {
   display: flex;
-  gap: 0;
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  overflow: hidden;
+  align-items: center;
+  gap: 0.15rem;
 }
 
 .lang-btn {
-  padding: 0.4rem 0.65rem;
-  font-family: var(--font-sans);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--text-muted);
-  background: transparent;
+  padding: 0.25rem 0.2rem;
+  background: none;
   border: none;
   cursor: pointer;
-  transition: color var(--duration-fast), background var(--duration-fast);
+  color: var(--text-muted);
 }
 
-.lang-btn:hover {
-  color: var(--text-secondary);
+.lang-btn + .lang-btn::before {
+  content: '/';
+  margin-right: 0.35rem;
+  color: var(--text-muted);
 }
 
+.lang-btn:hover,
 .lang-btn.active {
   color: var(--text-primary);
-  background: var(--accent-dim);
+}
+
+@media (max-width: 640px) {
+  .header {
+    padding: 1.1rem 0;
+  }
+
+  .logo-text {
+    font-size: 1.15rem;
+  }
+
+  .nav {
+    gap: 1.25rem;
+  }
 }
 
 /* ========== Hero ==========
-   Default (no JS / reduced motion): a static hero over the finished automaton,
-   with the three statements stacked. With .hero-animated, the hero pins and a
-   canvas scrubs through the sketch-to-automaton frames as the page scrolls;
-   the animation holds still whenever a statement is on screen. */
+   Default (no JS / reduced motion): the finished automaton with the three
+   statements over it. With .hero-animated the screen pins while a canvas
+   scrubs the sketch-to-automaton frames, and the statements scroll past it in a
+   layer that moves with the page. --run is how far the page scrolls while the
+   screen is pinned; each statement crosses its resting height --y at --at. */
+.hero-pin {
+  position: relative;
+}
+
 .hero {
   position: relative;
   min-height: 100vh;
-  display: flex;
-  align-items: flex-end;
-  padding: 8rem 1.5rem 6rem;
   overflow: hidden;
   background:
     linear-gradient(90deg, var(--bg-main) 10%, rgba(17, 12, 7, 0) 24%),
@@ -287,21 +299,28 @@ body {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(120% 95% at 0% 100%, rgba(17, 12, 7, 0.94) 0%, rgba(17, 12, 7, 0.62) 34%, rgba(17, 12, 7, 0) 64%),
-    linear-gradient(180deg, rgba(17, 12, 7, 0.45) 0%, rgba(17, 12, 7, 0) 16%, rgba(17, 12, 7, 0) 78%, var(--bg-main) 100%);
+    radial-gradient(110% 90% at 0% 100%, rgba(17, 12, 7, 0.9) 0%, rgba(17, 12, 7, 0.55) 34%, rgba(17, 12, 7, 0) 62%),
+    linear-gradient(90deg, rgba(17, 12, 7, 0.6) 0%, rgba(17, 12, 7, 0) 42%),
+    linear-gradient(180deg, rgba(17, 12, 7, 0.55) 0%, rgba(17, 12, 7, 0) 14%, rgba(17, 12, 7, 0) 80%, var(--bg-main) 100%);
 }
 
 .hero-content {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 1;
-  width: 100%;
-  max-width: var(--container);
-  margin: 0 auto;
+  padding-top: 9rem;
 }
 
 .hero-beats {
   display: grid;
   gap: 3rem;
+  max-width: var(--container);
+  margin: 0 auto;
+}
+
+.beat {
   max-width: 34rem;
 }
 
@@ -343,7 +362,8 @@ body {
 
 /* Scroll-driven mode */
 .hero-animated {
-  height: 500vh;
+  --run: 400vh;
+  height: calc(100vh + var(--run));
 }
 
 .hero-animated .hero {
@@ -351,7 +371,6 @@ body {
   top: 0;
   height: 100vh;
   min-height: 0;
-  padding: 0;
   background: var(--bg-main) url("../media/hero/desktop/webp/000.webp") 35% center / cover no-repeat;
 }
 
@@ -360,27 +379,25 @@ body {
 }
 
 .hero-animated .hero-content {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: clamp(3.5rem, 11vh, 7rem);
-  padding: 0 1.5rem;
-  max-width: none;
+  bottom: 0;
+  padding: 0;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .hero-animated .hero-beats {
-  max-width: var(--container);
-  margin: 0 auto;
-  gap: 0;
+  display: block;
+  position: relative;
+  height: 100%;
 }
 
 .hero-animated .beat {
-  grid-area: 1 / 1;
-  align-self: end;
-  max-width: 34rem;
+  position: absolute;
+  left: 0;
+  top: calc(var(--at) * var(--run) + var(--y));
+  transform: translateY(-50%);
   opacity: 0;
-  visibility: hidden;
-  will-change: opacity, transform;
+  will-change: opacity;
 }
 
 .hero-animated .hero-scroll-cue {
@@ -388,7 +405,7 @@ body {
   position: absolute;
   left: 50%;
   bottom: 1.5rem;
-  z-index: 1;
+  z-index: 3;
   margin: 0;
   font-family: var(--font-mono);
   font-size: 0.68rem;
@@ -405,31 +422,27 @@ body {
 
 @media (max-width: 860px) {
   .hero {
-    padding-top: calc(4.5rem + 75vw);
-    padding-bottom: 4rem;
-    background-image: url("../media/hero/mobile/webp/113.webp");
-    background-size: 100% auto;
-    background-position: center 4.5rem;
+    min-height: 75vw;
+    background: var(--bg-main) url("../media/hero/mobile/webp/113.webp") center top / 100% auto no-repeat;
   }
 
   .hero-canvas {
-    top: 4.5rem;
     bottom: auto;
     height: auto;
     aspect-ratio: 4 / 3;
   }
 
   .hero-shade {
-    background: linear-gradient(180deg, rgba(17, 12, 7, 0.5) 0, rgba(17, 12, 7, 0) 4.5rem, rgba(17, 12, 7, 0) calc(4.5rem + 55vw), var(--bg-main) calc(4.5rem + 75vw));
+    background: linear-gradient(180deg, rgba(17, 12, 7, 0.6) 0, rgba(17, 12, 7, 0) 5rem, rgba(17, 12, 7, 0) calc(75vw - 6rem), var(--bg-main) 75vw);
   }
 
-  .hero-content,
-  .hero-animated .hero-content {
+  .hero-content {
+    position: static;
+    padding: 2rem 0 3rem;
     text-align: center;
   }
 
-  .hero-beats,
-  .hero-animated .beat {
+  .beat {
     margin: 0 auto;
   }
 
@@ -442,23 +455,22 @@ body {
   }
 
   .hero-animated {
-    height: 420vh;
+    --run: 320vh;
   }
 
   .hero-animated .hero {
-    padding: 0;
-    background-image: url("../media/hero/mobile/webp/000.webp");
-    background-size: 100% auto;
-    background-position: center 4.5rem;
+    background: var(--bg-main) url("../media/hero/mobile/webp/000.webp") center top / 100% auto no-repeat;
   }
 
   .hero-animated .hero-content {
-    top: calc(4.5rem + 75vw + 2rem);
-    bottom: auto;
+    position: absolute;
+    padding: 0;
   }
 
   .hero-animated .beat {
-    align-self: start;
+    left: 0;
+    right: 0;
+    top: calc(var(--at) * var(--run) + 70vh);
   }
 
   .hero-animated .hero-scroll-cue {
@@ -606,125 +618,4 @@ body {
 
 .footer-email:hover {
   color: var(--accent);
-}
-
-/* ========== Header responsive nav ========== */
-.nav-toggle {
-  display: none;
-}
-
-@media (max-width: 900px) {
-  .header {
-    padding: 0.75rem 0;
-  }
-
-  .header-inner {
-    position: relative;
-    padding: 0 1rem;
-  }
-
-  .nav-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.7rem;
-    height: 2.7rem;
-    margin-left: auto;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: rgba(28, 21, 13, 0.6);
-    color: var(--text-primary);
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03), 0 10px 24px -16px rgba(0, 0, 0, 0.8);
-    cursor: pointer;
-    transition: border-color var(--duration-fast), background var(--duration-fast), transform var(--duration-fast);
-  }
-
-  .nav-toggle:hover {
-    border-color: var(--border-hover);
-    background: rgba(28, 21, 13, 0.8);
-    transform: translateY(-1px);
-  }
-
-  .nav-toggle-box {
-    position: relative;
-    width: 1.1rem;
-    height: 0.9rem;
-  }
-
-  .nav-toggle-line {
-    position: absolute;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    border-radius: 999px;
-    background: var(--text-primary);
-    transition: transform var(--duration-fast), opacity var(--duration-fast), top var(--duration-fast);
-  }
-
-  .nav-toggle-line:nth-child(1) { top: 0; }
-  .nav-toggle-line:nth-child(2) { top: calc(50% - 1px); opacity: 0.75; }
-  .nav-toggle-line:nth-child(3) { top: calc(100% - 2px); }
-
-  .header.nav-open .nav-toggle-line:nth-child(1) {
-    top: calc(50% - 1px);
-    transform: rotate(45deg);
-  }
-
-  .header.nav-open .nav-toggle-line:nth-child(2) {
-    opacity: 0;
-  }
-
-  .header.nav-open .nav-toggle-line:nth-child(3) {
-    top: calc(50% - 1px);
-    transform: rotate(-45deg);
-  }
-
-  .nav {
-    position: absolute;
-    top: calc(100% + 0.5rem);
-    left: 1rem;
-    right: 1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.45rem;
-    padding: 0.7rem;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: rgba(17, 12, 7, 0.95);
-    backdrop-filter: blur(14px);
-    box-shadow: 0 26px 40px -24px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(214, 172, 90, 0.1);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transform: translateY(-8px) scale(0.985);
-    transform-origin: top right;
-    transition: opacity var(--duration-fast), visibility var(--duration-fast), transform var(--duration-fast);
-  }
-
-  .header.nav-open .nav {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    transform: translateY(0) scale(1);
-  }
-
-  .nav-link {
-    width: 100%;
-    padding: 0.62rem 0.75rem;
-    border: 1px solid transparent;
-    border-radius: 3px;
-    background: rgba(28, 21, 13, 0.5);
-    justify-content: flex-start;
-    font-size: 0.92rem;
-  }
-
-  .nav-link:hover {
-    border-color: var(--border-hover);
-    transform: translateY(-1px);
-  }
-
-  .lang-toggle {
-    margin-top: 0.35rem;
-    align-self: flex-start;
-  }
 }

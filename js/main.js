@@ -132,69 +132,19 @@
     });
   }
 
-  function initHeaderScroll() {
-    var header = document.querySelector('.header');
-    if (!header) return;
-    var ticking = false;
-    function update() {
-      header.classList.toggle('scrolled', window.scrollY > 20);
-      ticking = false;
+  function prefersReducedMotion() {
+    try {
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    } catch (e) {
+      return false;
     }
-    window.addEventListener('scroll', function () {
-      if (!ticking) {
-        requestAnimationFrame(update);
-        ticking = true;
-      }
-    }, { passive: true });
-  }
-
-  function initMobileNav() {
-    var header = document.querySelector('.header');
-    var toggle = document.querySelector('.nav-toggle');
-    var nav = document.querySelector('.nav');
-    if (!header || !toggle || !nav) return;
-
-    function setOpen(open) {
-      header.classList.toggle('nav-open', open);
-      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      toggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
-    }
-
-    toggle.addEventListener('click', function () {
-      setOpen(!header.classList.contains('nav-open'));
-    });
-
-    nav.querySelectorAll('a').forEach(function (link) {
-      link.addEventListener('click', function () {
-        setOpen(false);
-      });
-    });
-
-    document.addEventListener('click', function (event) {
-      if (!header.classList.contains('nav-open')) return;
-      if (header.contains(event.target)) return;
-      setOpen(false);
-    });
-
-    document.addEventListener('keydown', function (event) {
-      if (event.key === 'Escape') setOpen(false);
-    });
-
-    window.addEventListener('resize', function () {
-      if (window.innerWidth > 900) setOpen(false);
-    });
   }
 
   function initReveals() {
     var els = document.querySelectorAll('.reveal');
     if (!els.length) return;
 
-    var reducedMotion = false;
-    try {
-      reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    } catch (e) {}
-
-    if (reducedMotion) {
+    if (prefersReducedMotion()) {
       els.forEach(function (el) {
         el.classList.add('revealed');
       });
@@ -218,23 +168,23 @@
     });
   }
 
+  // Wheel and trackpad scrolling glide instead of stepping; touch stays native.
+  function initSmoothScroll() {
+    if (prefersReducedMotion() || typeof window.Lenis !== 'function') return;
+    new window.Lenis({ autoRaf: true, anchors: true });
+  }
+
   function initHeroSequence() {
     var pin = document.querySelector('.hero-pin');
     var canvas = pin && pin.querySelector('.hero-canvas');
-    if (!canvas || !canvas.getContext) return;
-
-    var reducedMotion = false;
-    try {
-      reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    } catch (e) {}
-    if (reducedMotion) return;
+    if (!canvas || !canvas.getContext || prefersReducedMotion()) return;
 
     // Frames 0-33 are the drawing, 34-113 the assembly into the automaton.
     var FRAME_COUNT = 114;
     var DRAWING_END = 33;
     var LAST = FRAME_COUNT - 1;
-    // Scroll progress -> frame. Flat segments hold the image still while a
-    // statement is on screen; the animation only plays between statements.
+    // Scroll progress -> frame. The flat segments hold the image still while a
+    // statement passes; these points line up with each statement's --at.
     var TIMELINE = [
       { to: 0.12, from: 0, until: 0 },
       { to: 0.36, from: 0, until: DRAWING_END },
@@ -242,27 +192,17 @@
       { to: 0.88, from: DRAWING_END, until: LAST },
       { to: 1, from: LAST, until: LAST }
     ];
-    var FADE = 0.035;
     var AVIF_PROBE = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAAD5bWV0YQAAAAAAAAAvaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAFBpY3R1cmVIYW5kbGVyAAAAAA5waXRtAAAAAAABAAAAHmlsb2MAAAAARAAAAQABAAAAAQAAASEAAAAUAAAAKGlpbmYAAAAAAAEAAAAaaW5mZQIAAAAAAQAAYXYwMUNvbG9yAAAAAGppcHJwAAAAS2lwY28AAAAUaXNwZQAAAAAAAAACAAAAAgAAABBwaXhpAAAAAAMICAgAAAAMYXYxQ4EADAAAAAATY29scm5jbHgAAgACAAIAAAAAF2lwbWEAAAAAAAAAAQABBAECgwQAAAAcbWRhdAoFGAA2wCAyCx/wAABYAAAAAK8w';
 
     var mobileQuery = window.matchMedia('(max-width: 860px)');
     var ctx = canvas.getContext('2d');
     var cue = pin.querySelector('.hero-scroll-cue');
-    var beats = Array.prototype.map.call(pin.querySelectorAll('.beat'), function (el, i, all) {
-      return {
-        el: el,
-        start: parseFloat(el.getAttribute('data-in')),
-        end: parseFloat(el.getAttribute('data-out')),
-        first: i === 0,
-        last: i === all.length - 1
-      };
-    });
+    var beats = Array.prototype.slice.call(pin.querySelectorAll('.beat'));
 
     var format = null;
     var frames = [];
     var set = '';
-    var progress = 0;
-    var drawnIndex = -1;
+    var drawnKey = '';
     var ticking = false;
 
     pin.classList.add('hero-animated');
@@ -274,7 +214,7 @@
         if (p <= seg.to || i === TIMELINE.length - 1) {
           var t = seg.to > segStart ? (p - segStart) / (seg.to - segStart) : 1;
           t = Math.max(0, Math.min(1, t));
-          return Math.round(seg.from + (seg.until - seg.from) * t);
+          return seg.from + (seg.until - seg.from) * t;
         }
         segStart = seg.to;
       }
@@ -306,7 +246,7 @@
       if (nextSet === set) return;
       set = nextSet;
       frames = new Array(FRAME_COUNT);
-      drawnIndex = -1;
+      drawnKey = '';
       var queue = loadOrder();
       var active = 0;
       var token = set;
@@ -323,7 +263,7 @@
               if (token !== set) return;
               if (event.type === 'load') {
                 frames[index] = image;
-                drawnIndex = -1;
+                drawnKey = '';
                 schedule();
               }
               pump();
@@ -350,12 +290,11 @@
       if (canvas.width !== w || canvas.height !== h) {
         canvas.width = w;
         canvas.height = h;
-        drawnIndex = -1;
+        drawnKey = '';
       }
     }
 
-    function drawFrame(index) {
-      var img = frames[index];
+    function paint(img, alpha) {
       var cw = canvas.width;
       var ch = canvas.height;
       var scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
@@ -364,11 +303,30 @@
       // When the viewport is narrower than the frame, crop mostly from the empty left side.
       var x = (cw - w) * (set === 'desktop' ? 0.35 : 0.5);
       var y = (ch - h) * 0.5;
+      ctx.globalAlpha = alpha;
+      ctx.drawImage(img, x, y, w, h);
+    }
+
+    // Blending the two frames either side of the scroll position hides the
+    // step from one frame to the next, so the motion reads as continuous.
+    function drawAt(position) {
+      var a = Math.floor(position);
+      var b = Math.min(a + 1, LAST);
+      var mix = position - a;
+      var base = frames[a] ? a : nearestLoaded(Math.round(position));
+      if (base < 0) return;
+      var blend = frames[a] && frames[b] && b !== a && mix > 0.01;
+      var key = set + ':' + base + ':' + (blend ? mix.toFixed(2) : '0');
+      if (key === drawnKey) return;
+      drawnKey = key;
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = 'high';
+      ctx.globalAlpha = 1;
       ctx.fillStyle = '#110c07';
-      ctx.fillRect(0, 0, cw, ch);
-      ctx.drawImage(img, x, y, w, h);
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      paint(frames[base], 1);
+      if (blend) paint(frames[b], mix);
+      ctx.globalAlpha = 1;
     }
 
     function smoothstep(a, b, v) {
@@ -376,33 +334,33 @@
       return t * t * (3 - 2 * t);
     }
 
+    // Statements scroll with the page; they fade in near the bottom of the
+    // screen and out near the top (on phones, before they reach the image).
     function updateBeats() {
-      beats.forEach(function (b) {
-        var fadeIn = b.first ? 1 : smoothstep(b.start, b.start + FADE, progress);
-        var fadeOut = b.last ? 1 : 1 - smoothstep(b.end - FADE, b.end, progress);
+      var vh = window.innerHeight;
+      var topEdge = mobileQuery.matches ? canvas.getBoundingClientRect().bottom : vh * 0.08;
+      var topRange = mobileQuery.matches ? vh * 0.1 : vh * 0.2;
+      beats.forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        var fadeIn = 1 - smoothstep(vh * 0.86, vh, r.bottom);
+        var fadeOut = smoothstep(topEdge, topEdge + topRange, r.top);
         var o = Math.min(fadeIn, fadeOut);
-        var shift = progress < b.start + FADE ? 12 : -12;
-        b.el.style.opacity = o;
-        b.el.style.transform = 'translateY(' + ((1 - o) * shift) + 'px)';
-        b.el.style.visibility = o < 0.01 ? 'hidden' : 'visible';
+        el.style.opacity = o.toFixed(3);
+        el.style.visibility = o < 0.01 ? 'hidden' : 'visible';
       });
-      if (cue) cue.style.opacity = 1 - smoothstep(0, 0.04, progress);
     }
 
     function render() {
       ticking = false;
       var rect = pin.getBoundingClientRect();
       var scrollable = pin.offsetHeight - window.innerHeight;
-      progress = scrollable > 0 ? Math.max(0, Math.min(1, -rect.top / scrollable)) : 0;
+      var progress = scrollable > 0 ? Math.max(0, Math.min(1, -rect.top / scrollable)) : 0;
 
       updateBeats();
+      if (cue) cue.style.opacity = 1 - smoothstep(0, 0.04, progress);
       if (!format) return;
       resizeCanvas();
-      var index = nearestLoaded(frameAt(progress));
-      if (index >= 0 && index !== drawnIndex) {
-        drawFrame(index);
-        drawnIndex = index;
-      }
+      drawAt(frameAt(progress));
     }
 
     function schedule() {
@@ -421,7 +379,7 @@
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', function () {
       if (format) loadFrames();
-      drawnIndex = -1;
+      drawnKey = '';
       schedule();
     });
     schedule();
@@ -434,8 +392,7 @@
 
   function init() {
     initLang();
-    initHeaderScroll();
-    initMobileNav();
+    initSmoothScroll();
     initReveals();
     initHeroSequence();
   }
