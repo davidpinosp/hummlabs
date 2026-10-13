@@ -269,7 +269,7 @@ body {
 /* ========== Hero ==========
    Default (no JS / reduced motion): the finished automaton with the three
    statements over it. With .hero-animated the screen pins while a canvas
-   scrubs the sketch-to-automaton frames. Each statement scrolls in, sticks at
+   scrubs the sketch-to-automaton video. Each statement scrolls in, sticks at
    its resting height --y while the animation plays, then scrolls out; the
    script drives that from the data-in / data-out ranges. --run is how far the
    page scrolls while the screen is pinned. */
@@ -284,15 +284,18 @@ body {
   background:
     linear-gradient(90deg, var(--bg-main) 10%, rgba(17, 12, 7, 0) 24%),
     linear-gradient(180deg, rgba(17, 12, 7, 0) calc(50.6vw - 10rem), var(--bg-main) 50.6vw),
-    var(--bg-main) url("../media/hero/desktop/webp/113.webp") right top / 90% auto no-repeat;
+    var(--bg-main) url("../media/hero/hero-end-desktop.webp") right top / 90% auto no-repeat;
 }
 
-.hero-canvas {
+.hero-video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   display: none;
+  object-fit: cover;
+  object-position: 35% 50%;
+  pointer-events: none;
 }
 
 .hero-shade {
@@ -363,7 +366,7 @@ body {
 
 /* Scroll-driven mode */
 .hero-animated {
-  --run: 340vh;
+  --run: 520vh;
   height: calc(100vh + var(--run));
 }
 
@@ -372,10 +375,10 @@ body {
   top: 0;
   height: 100vh;
   min-height: 0;
-  background: var(--bg-main) url("../media/hero/desktop/webp/000.webp") 35% center / cover no-repeat;
+  background: var(--bg-main) url("../media/hero/hero-start-desktop.webp") 35% center / cover no-repeat;
 }
 
-.hero-animated .hero-canvas {
+.hero-animated .hero-video {
   display: block;
 }
 
@@ -424,13 +427,14 @@ body {
 @media (max-width: 860px) {
   .hero {
     min-height: 75vw;
-    background: var(--bg-main) url("../media/hero/mobile/webp/113.webp") center top / 100% auto no-repeat;
+    background: var(--bg-main) url("../media/hero/hero-end-mobile.webp") center top / 100% auto no-repeat;
   }
 
-  .hero-canvas {
+  .hero-video {
     bottom: auto;
     height: auto;
     aspect-ratio: 4 / 3;
+    object-position: center;
   }
 
   .hero-shade {
@@ -456,11 +460,11 @@ body {
   }
 
   .hero-animated {
-    --run: 300vh;
+    --run: 440vh;
   }
 
   .hero-animated .hero {
-    background: var(--bg-main) url("../media/hero/mobile/webp/000.webp") center top / 100% auto no-repeat;
+    background: var(--bg-main) url("../media/hero/hero-start-mobile.webp") center top / 100% auto no-repeat;
   }
 
   .hero-animated .hero-content {
@@ -608,15 +612,11 @@ body {
   text-align: center;
 }
 
-.footer-email {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 1.0625rem;
-  color: var(--text-secondary);
-  text-decoration: none;
-  transition: color var(--duration-fast);
-}
-
-.footer-email:hover {
-  color: var(--accent);
+.footer-note {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
 }

@@ -21,7 +21,8 @@
       laburo_cta: "Visit Laburo",
       next_teaser: "More ventures are taking shape.",
       meta_home_title: "Humm Labs — Technology for the world we want to live in",
-      meta_home_desc: "Humm Labs is an idea lab. We build, acquire, scale, and operate technology ventures. Our first is Laburo, the AI hiring operating system for LatAm."
+      meta_home_desc: "Humm Labs is an idea lab. We build, acquire, scale, and operate technology ventures. Our first is Laburo, the AI hiring operating system for LatAm.",
+      footer_made: "Made in Ecuador"
     },
     es: {
       logo: "Humm Labs",
@@ -40,7 +41,8 @@
       laburo_cta: "Visitar Laburo",
       next_teaser: "Otras empresas están tomando forma.",
       meta_home_title: "Humm Labs — Tecnología para el mundo en el que queremos vivir",
-      meta_home_desc: "Humm Labs es un idea lab. Construimos, adquirimos, escalamos y operamos empresas de tecnología. La primera es Laburo, el sistema operativo de contratación con IA para LatAm."
+      meta_home_desc: "Humm Labs es un idea lab. Construimos, adquirimos, escalamos y operamos empresas de tecnología. La primera es Laburo, el sistema operativo de contratación con IA para LatAm.",
+      footer_made: "Hecho en Ecuador"
     }
   };
 
@@ -176,27 +178,30 @@
 
   function initHeroSequence() {
     var pin = document.querySelector('.hero-pin');
-    var canvas = pin && pin.querySelector('.hero-canvas');
-    if (!canvas || !canvas.getContext || prefersReducedMotion()) return;
+    var video = pin && pin.querySelector('.hero-video');
+    if (!video || typeof video.play !== 'function' || prefersReducedMotion()) return;
 
-    // Frames 0-33 are the drawing, 34-113 the assembly into the automaton.
-    var FRAME_COUNT = 114;
-    var DRAWING_END = 33;
-    var LAST = FRAME_COUNT - 1;
-    // Scroll progress -> frame. The flat segments hold the image still: on the
-    // first sketch, on the finished drawing, and on the finished automaton.
+    // The video is the drawing (0 - DRAWING_END) followed by the transformation
+    // into the automaton, at 24 fps, encoded with a keyframe every 12 frames so
+    // seeking anywhere is cheap.
+    var DRAWING_END = 68 / 24;
+    // Scroll progress -> video time. The flat segments hold the image still on
+    // the first sketch, the finished drawing and the finished automaton.
+    var END = -1;
     var TIMELINE = [
-      { to: 0.06, from: 0, until: 0 },
-      { to: 0.32, from: 0, until: DRAWING_END },
-      { to: 0.5, from: DRAWING_END, until: DRAWING_END },
-      { to: 0.86, from: DRAWING_END, until: LAST },
-      { to: 1, from: LAST, until: LAST }
+      { to: 0.05, from: 0, until: 0 },
+      { to: 0.22, from: 0, until: DRAWING_END },
+      { to: 0.36, from: DRAWING_END, until: DRAWING_END },
+      { to: 0.88, from: DRAWING_END, until: END },
+      { to: 1, from: END, until: END }
     ];
-    var AVIF_PROBE = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAAD5bWV0YQAAAAAAAAAvaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAFBpY3R1cmVIYW5kbGVyAAAAAA5waXRtAAAAAAABAAAAHmlsb2MAAAAARAAAAQABAAAAAQAAASEAAAAUAAAAKGlpbmYAAAAAAAEAAAAaaW5mZQIAAAAAAQAAYXYwMUNvbG9yAAAAAGppcHJwAAAAS2lwY28AAAAUaXNwZQAAAAAAAAACAAAAAgAAABBwaXhpAAAAAAMICAgAAAAMYXYxQ4EADAAAAAATY29scm5jbHgAAgACAAIAAAAAF2lwbWEAAAAAAAAAAQABBAECgwQAAAAcbWRhdAoFGAA2wCAyCx/wAABYAAAAAK8w';
+    // How quickly the shown time catches up with the scroll (per second). The
+    // easing turns uneven scroll input into continuous motion.
+    var CATCH_UP = 9;
 
     var mobileQuery = window.matchMedia('(max-width: 860px)');
-    var ctx = canvas.getContext('2d');
     var cue = pin.querySelector('.hero-scroll-cue');
+
     function range(el, name) {
       var value = el.getAttribute(name);
       return value ? value.split(' ').map(parseFloat) : null;
@@ -205,148 +210,87 @@
       return { el: el, enter: range(el, 'data-in'), exit: range(el, 'data-out') };
     });
 
-    var format = null;
-    var frames = [];
     var set = '';
-    var drawnKey = '';
-    var ticking = false;
+    var duration = 0;
+    var shown = 0;
+    var target = 0;
+    var lastTick = 0;
+    var unlocked = false;
 
     pin.classList.add('hero-animated');
 
-    function frameAt(p) {
+    function resolve(t) {
+      return t === END ? Math.max(0, duration - 1 / 24) : t;
+    }
+
+    function timeAt(p) {
       var segStart = 0;
       for (var i = 0; i < TIMELINE.length; i++) {
         var seg = TIMELINE[i];
         if (p <= seg.to || i === TIMELINE.length - 1) {
           var t = seg.to > segStart ? (p - segStart) / (seg.to - segStart) : 1;
           t = Math.max(0, Math.min(1, t));
-          return seg.from + (seg.until - seg.from) * t;
+          var from = resolve(seg.from);
+          return from + (resolve(seg.until) - from) * t;
         }
         segStart = seg.to;
       }
-      return LAST;
+      return resolve(END);
     }
 
-    function framePath(i) {
-      return 'media/hero/' + set + '/' + format + '/' + ('00' + i).slice(-3) + '.' + format;
-    }
-
-    // The frames the visitor rests on load first, then the timeline fills in coarse-to-fine.
-    function loadOrder() {
-      var order = [0, DRAWING_END, LAST];
-      var seen = {};
-      order.forEach(function (i) { seen[i] = true; });
-      [12, 6, 3, 1].forEach(function (step) {
-        for (var i = 0; i < FRAME_COUNT; i += step) {
-          if (!seen[i]) {
-            seen[i] = true;
-            order.push(i);
-          }
-        }
+    function loadSet() {
+      var next = mobileQuery.matches ? 'mobile' : 'desktop';
+      if (next === set) return;
+      set = next;
+      duration = 0;
+      while (video.firstChild) video.removeChild(video.firstChild);
+      video.poster = 'media/hero/hero-start-' + set + '.webp';
+      [['mp4', 'video/mp4'], ['webm', 'video/webm']].forEach(function (pair) {
+        var source = document.createElement('source');
+        source.src = 'media/hero/hero-' + set + '.' + pair[0];
+        source.type = pair[1];
+        video.appendChild(source);
       });
-      return order;
+      video.load();
     }
 
-    function loadFrames() {
-      var nextSet = mobileQuery.matches ? 'mobile' : 'desktop';
-      if (nextSet === set) return;
-      set = nextSet;
-      frames = new Array(FRAME_COUNT);
-      drawnKey = '';
-      var queue = loadOrder();
-      var active = 0;
-      var token = set;
-
-      function pump() {
-        while (active < 6 && queue.length) {
-          var i = queue.shift();
-          var img = new Image();
-          img.decoding = 'async';
-          active++;
-          img.onload = img.onerror = (function (index, image) {
-            return function (event) {
-              active--;
-              if (token !== set) return;
-              if (event.type === 'load') {
-                frames[index] = image;
-                drawnKey = '';
-                schedule();
-              }
-              pump();
-            };
-          })(i, img);
-          img.src = framePath(i);
-        }
-      }
-      pump();
-    }
-
-    function nearestLoaded(target) {
-      for (var offset = 0; offset < FRAME_COUNT; offset++) {
-        if (frames[target - offset]) return target - offset;
-        if (frames[target + offset]) return target + offset;
-      }
-      return -1;
-    }
-
-    function resizeCanvas() {
-      var dpr = Math.min(window.devicePixelRatio || 1, 2);
-      var w = Math.round(canvas.clientWidth * dpr);
-      var h = Math.round(canvas.clientHeight * dpr);
-      if (canvas.width !== w || canvas.height !== h) {
-        canvas.width = w;
-        canvas.height = h;
-        drawnKey = '';
+    // iOS only paints seeked frames after the video has played once; a muted,
+    // inline play-then-pause unlocks it without any visible playback.
+    function unlock() {
+      if (unlocked) return;
+      var attempt = video.play();
+      if (attempt && typeof attempt.then === 'function') {
+        attempt.then(function () {
+          unlocked = true;
+          video.pause();
+          video.currentTime = shown;
+        }).catch(function () {});
+      } else {
+        unlocked = true;
+        video.pause();
       }
     }
 
-    function paint(img, alpha) {
-      var cw = canvas.width;
-      var ch = canvas.height;
-      var scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
-      var w = img.naturalWidth * scale;
-      var h = img.naturalHeight * scale;
-      // When the viewport is narrower than the frame, crop mostly from the empty left side.
-      var x = (cw - w) * (set === 'desktop' ? 0.35 : 0.5);
-      var y = (ch - h) * 0.5;
-      ctx.globalAlpha = alpha;
-      ctx.drawImage(img, x, y, w, h);
-    }
-
-    // Blending the two frames either side of the scroll position hides the
-    // step from one frame to the next, so the motion reads as continuous.
-    function drawAt(position) {
-      var a = Math.floor(position);
-      var b = Math.min(a + 1, LAST);
-      var mix = position - a;
-      var base = frames[a] ? a : nearestLoaded(Math.round(position));
-      if (base < 0) return;
-      var blend = frames[a] && frames[b] && b !== a && mix > 0.01;
-      var key = set + ':' + base + ':' + (blend ? mix.toFixed(2) : '0');
-      if (key === drawnKey) return;
-      drawnKey = key;
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = 'high';
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = '#110c07';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      paint(frames[base], 1);
-      if (blend) paint(frames[b], mix);
-      ctx.globalAlpha = 1;
-    }
-
-    function smoothstep(a, b, v) {
-      var t = Math.max(0, Math.min(1, (v - a) / (b - a)));
-      return t * t * (3 - 2 * t);
-    }
+    video.addEventListener('loadedmetadata', function () {
+      duration = video.duration || 0;
+      video.currentTime = shown;
+    });
+    video.addEventListener('loadeddata', unlock);
+    ['touchstart', 'pointerdown', 'wheel', 'keydown'].forEach(function (type) {
+      window.addEventListener(type, unlock, { passive: true, once: true });
+    });
 
     function clamp01(v) {
       return Math.max(0, Math.min(1, v));
     }
 
+    function smoothstep(a, b, v) {
+      var t = clamp01((v - a) / (b - a));
+      return t * t * (3 - 2 * t);
+    }
+
     // Each statement scrolls in, sticks while the animation plays behind it,
-    // then scrolls out. Movement follows the scroll, easing into and out of the
-    // resting point, so it reads like the page itself pausing.
+    // then scrolls out, easing into and out of its resting point.
     function updateBeats(progress) {
       var travel = window.innerHeight * (mobileQuery.matches ? 0.16 : 0.32);
       beats.forEach(function (b) {
@@ -367,44 +311,32 @@
       });
     }
 
-    function render() {
-      ticking = false;
+    function tick(now) {
+      requestAnimationFrame(tick);
+      var dt = lastTick ? Math.min(0.1, (now - lastTick) / 1000) : 0;
+      lastTick = now;
+
       var rect = pin.getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
       var scrollable = pin.offsetHeight - window.innerHeight;
-      var progress = scrollable > 0 ? Math.max(0, Math.min(1, -rect.top / scrollable)) : 0;
+      var progress = scrollable > 0 ? clamp01(-rect.top / scrollable) : 0;
 
       updateBeats(progress);
       if (cue) cue.style.opacity = 1 - smoothstep(0, 0.04, progress);
-      if (!format) return;
-      resizeCanvas();
-      drawAt(frameAt(progress));
-    }
+      if (!duration) return;
 
-    function schedule() {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(render);
+      target = timeAt(progress);
+      shown += (target - shown) * (1 - Math.exp(-CATCH_UP * dt));
+      if (Math.abs(target - shown) < 0.002) shown = target;
+      // One seek at a time: queueing seeks makes the browser fall behind.
+      if (!video.seeking && Math.abs(video.currentTime - shown) > 0.012) {
+        video.currentTime = shown;
       }
     }
 
-    function start(supportsAvif) {
-      format = supportsAvif ? 'avif' : 'webp';
-      loadFrames();
-      schedule();
-    }
-
-    window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', function () {
-      if (format) loadFrames();
-      drawnKey = '';
-      schedule();
-    });
-    schedule();
-
-    var probe = new Image();
-    probe.onload = function () { start(probe.naturalWidth > 0); };
-    probe.onerror = function () { start(false); };
-    probe.src = AVIF_PROBE;
+    window.addEventListener('resize', loadSet);
+    loadSet();
+    requestAnimationFrame(tick);
   }
 
   function init() {

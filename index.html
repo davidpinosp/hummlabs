@@ -29,7 +29,7 @@
   <meta name="theme-color" content="#110c07" />
   <link rel="preload" href="fonts/instrument-serif.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/geist.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="css/main.css?v=a0e8e51db5" />
+  <link rel="stylesheet" href="css/main.css?v=ff41006a10" />
 </head>
 <body class="landing-page">
   <div class="noise" aria-hidden="true"></div>
@@ -50,20 +50,20 @@
   <main>
     <section class="hero-pin" id="top">
       <div class="hero">
-        <canvas class="hero-canvas" aria-hidden="true"></canvas>
+        <video class="hero-video" muted playsinline preload="auto" aria-hidden="true" tabindex="-1"></video>
         <div class="hero-shade" aria-hidden="true"></div>
         <div class="hero-content">
           <div class="hero-beats">
-            <div class="beat" style="--y: 64vh" data-out="0.2 0.28">
+            <div class="beat" style="--y: 64vh" data-out="0.16 0.22">
               <p class="hero-label" data-i18n="hero_label">Idea Lab</p>
               <h1 class="hero-title" data-i18n="hero_title">Technology for the world we want to live in.</h1>
               <p class="beat-desc" data-i18n="hero_desc">Humm Labs is an idea lab. We build, acquire, scale, and operate technology ventures.</p>
             </div>
-            <div class="beat" style="--y: 60vh" data-in="0.28 0.34" data-out="0.52 0.6">
+            <div class="beat" style="--y: 60vh" data-in="0.2 0.25" data-out="0.56 0.62">
               <h2 class="beat-title" data-i18n="beat_2_title">Every idea starts as a sketch.</h2>
               <p class="beat-desc" data-i18n="beat_2_desc">We look closely at real problems, then design the software and AI to solve them.</p>
             </div>
-            <div class="beat" style="--y: 60vh" data-in="0.8 0.86">
+            <div class="beat" style="--y: 60vh" data-in="0.74 0.8">
               <h2 class="beat-title" data-i18n="beat_3_title">Then we build it to last.</h2>
               <p class="beat-desc" data-i18n="beat_3_desc">We turn ideas into companies, run them with care, and let them leave their surroundings better than they found them.</p>
             </div>
@@ -92,11 +92,11 @@
 
   <footer class="footer">
     <div class="footer-inner">
-      <a href="mailto:david@quierolaburo.com" class="footer-email">david@quierolaburo.com</a>
+      <p class="footer-note" data-i18n="footer_made">Made in Ecuador</p>
     </div>
   </footer>
 
   <script src="js/vendor/lenis.min.js"></script>
-  <script src="js/main.js?v=252866e29a"></script>
+  <script src="js/main.js?v=98e7ceab27"></script>
 </body>
 </html>
