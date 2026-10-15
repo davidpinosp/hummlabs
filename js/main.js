@@ -7,41 +7,55 @@
     en: {
       logo: "Humm Labs",
       nav_laburo: "Laburo",
-      hero_label: "Idea Lab",
+      hero_label: "Idea Lab · Ecuador",
       hero_title: "Technology for the world we want to live in.",
-      hero_desc: "Humm Labs is an idea lab. We build, acquire, scale, and operate technology ventures.",
-      beat_2_title: "Every idea starts as a sketch.",
-      beat_2_desc: "We look closely at real problems, then design the software and AI to solve them.",
-      beat_3_title: "Then we build it to last.",
-      beat_3_desc: "We turn ideas into companies, run them with care, and let them leave their surroundings better than they found them.",
+      hero_desc: "We build and operate technology companies from Ecuador, with global reach.",
+      beat_2_title: "It starts as a sketch.",
+      beat_2_desc: "A real problem, looked at closely, and a clear idea of how it could be better.",
+      beat_3_title: "Then we build it, piece by piece.",
+      beat_3_desc: "Software and AI made with care, and companies made to last.",
       scroll_cue: "Scroll",
-      laburo_eyebrow: "Our first venture",
+      values_eyebrow: "What moves us",
+      value_1_title: "Beautiful technology",
+      value_1_desc: "Cutting-edge tools, made with craft. Powerful should also mean beautiful.",
+      value_2_title: "No ceilings",
+      value_2_desc: "Where you start shouldn't decide how far you go. We build to break down the mental and economic barriers in the way.",
+      value_3_title: "Grow what surrounds us",
+      value_3_desc: "Every company we build should leave its community stronger: technologically, economically, and in spirit.",
+      laburo_eyebrow: "Our first company",
       status_live: "Live",
       laburo_desc: "The AI hiring operating system for LatAm. It helps companies hire frontline teams, and helps people find work sooner.",
       laburo_cta: "Visit Laburo",
-      next_teaser: "More ventures are taking shape.",
+      next_teaser: "More on the way.",
       meta_home_title: "Humm Labs — Technology for the world we want to live in",
-      meta_home_desc: "Humm Labs is an idea lab. We build, acquire, scale, and operate technology ventures. Our first is Laburo, the AI hiring operating system for LatAm.",
+      meta_home_desc: "Humm Labs builds and operates technology companies from Ecuador, with global reach. Our first is Laburo, the AI hiring operating system for LatAm.",
       footer_made: "Made in Ecuador"
     },
     es: {
       logo: "Humm Labs",
       nav_laburo: "Laburo",
-      hero_label: "Idea Lab",
+      hero_label: "Idea Lab · Ecuador",
       hero_title: "Tecnología para el mundo en el que queremos vivir.",
-      hero_desc: "Humm Labs es un idea lab. Construimos, adquirimos, escalamos y operamos empresas de tecnología.",
-      beat_2_title: "Toda idea empieza como un boceto.",
-      beat_2_desc: "Miramos de cerca problemas reales y luego diseñamos el software y la IA para resolverlos.",
-      beat_3_title: "Después, la construimos para que dure.",
-      beat_3_desc: "Convertimos ideas en empresas, las operamos con cuidado y dejamos que mejoren el entorno que las rodea.",
+      hero_desc: "Construimos y operamos empresas de tecnología desde Ecuador, con alcance global.",
+      beat_2_title: "Empieza como un boceto.",
+      beat_2_desc: "Un problema real, mirado de cerca, y una idea clara de cómo podría ser mejor.",
+      beat_3_title: "Luego lo construimos, pieza por pieza.",
+      beat_3_desc: "Software e IA hechos con cuidado, y empresas hechas para durar.",
       scroll_cue: "Desliza",
+      values_eyebrow: "Lo que nos mueve",
+      value_1_title: "Tecnología bella",
+      value_1_desc: "Herramientas de vanguardia, hechas con oficio. Lo poderoso también debe ser bello.",
+      value_2_title: "Sin techo",
+      value_2_desc: "Dónde empiezas no debería decidir hasta dónde llegas. Construimos para derribar las barreras mentales y económicas en el camino.",
+      value_3_title: "Hacer crecer nuestro entorno",
+      value_3_desc: "Cada empresa que construimos debe dejar a su comunidad más fuerte: en tecnología, en economía y en espíritu.",
       laburo_eyebrow: "Nuestra primera empresa",
       status_live: "En vivo",
       laburo_desc: "El sistema operativo de contratación con IA para LatAm. Ayuda a las empresas a contratar equipos frontline, y a las personas a encontrar trabajo antes.",
       laburo_cta: "Visitar Laburo",
-      next_teaser: "Otras empresas están tomando forma.",
+      next_teaser: "Vienen más.",
       meta_home_title: "Humm Labs — Tecnología para el mundo en el que queremos vivir",
-      meta_home_desc: "Humm Labs es un idea lab. Construimos, adquirimos, escalamos y operamos empresas de tecnología. La primera es Laburo, el sistema operativo de contratación con IA para LatAm.",
+      meta_home_desc: "Humm Labs construye y opera empresas de tecnología desde Ecuador, con alcance global. La primera es Laburo, el sistema operativo de contratación con IA para LatAm.",
       footer_made: "Hecho en Ecuador"
     }
   };
@@ -201,6 +215,8 @@
 
     var mobileQuery = window.matchMedia('(max-width: 860px)');
     var cue = pin.querySelector('.hero-scroll-cue');
+    var dim = pin.querySelector('.hero-dim');
+    var finale = document.querySelector('.chapter-final');
 
     function range(el, name) {
       var value = el.getAttribute(name);
@@ -216,6 +232,7 @@
     var target = 0;
     var lastTick = 0;
     var unlocked = false;
+    var scrimOn = false;
 
     pin.classList.add('hero-animated');
 
@@ -290,8 +307,10 @@
     }
 
     // Each statement scrolls in, sticks while the animation plays behind it,
-    // then scrolls out, easing into and out of its resting point.
-    function updateBeats(progress) {
+    // then scrolls out, easing into and out of its resting point. A statement
+    // with no exit range stays until the pin ends, then scrolls away with the
+    // page (past is how far the page has scrolled beyond the pin).
+    function updateBeats(progress, past) {
       var travel = window.innerHeight * (mobileQuery.matches ? 0.16 : 0.32);
       beats.forEach(function (b) {
         var offset = 0;
@@ -304,6 +323,8 @@
           var tout = clamp01((progress - b.exit[0]) / (b.exit[1] - b.exit[0]));
           offset = -Math.pow(tout, 3) * travel;
           opacity = 1 - smoothstep(0.25, 1, tout);
+        } else if (!b.exit) {
+          offset = -past;
         }
         b.el.style.opacity = opacity.toFixed(3);
         b.el.style.transform = 'translate3d(0, ' + offset.toFixed(1) + 'px, 0) translateY(-50%)';
@@ -316,13 +337,29 @@
       var dt = lastTick ? Math.min(0.1, (now - lastTick) / 1000) : 0;
       lastTick = now;
 
+      // The hero stays fixed behind the whole page, so it never scrolls past
+      // the finished automaton; the rest of the page slides in over it.
+      var vh = window.innerHeight;
       var rect = pin.getBoundingClientRect();
-      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
-      var scrollable = pin.offsetHeight - window.innerHeight;
+      var scrollable = pin.offsetHeight - vh;
       var progress = scrollable > 0 ? clamp01(-rect.top / scrollable) : 0;
+      var past = Math.max(0, -rect.top - scrollable);
 
-      updateBeats(progress);
+      updateBeats(progress, past);
       if (cue) cue.style.opacity = 1 - smoothstep(0, 0.04, progress);
+      // Darken the automaton while text passes over it, and bring it back for
+      // the final screen.
+      if (dim) {
+        var arrive = finale ? 1 - finale.getBoundingClientRect().top / vh : 0;
+        var amount = smoothstep(0.05, 0.5, past / vh) * (1 - smoothstep(0.7, 1, arrive));
+        dim.style.opacity = amount.toFixed(3);
+      }
+      // Text scrolling off the top fades out under the header.
+      var scrim = past > 0;
+      if (scrim !== scrimOn) {
+        scrimOn = scrim;
+        document.body.classList.toggle('header-scrim', scrim);
+      }
       if (!duration) return;
 
       target = timeAt(progress);
