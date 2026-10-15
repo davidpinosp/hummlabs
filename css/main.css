@@ -192,13 +192,6 @@ body {
   text-decoration: none;
 }
 
-.logo-img {
-  display: block;
-  height: 26px;
-  width: auto;
-  opacity: 0.92;
-}
-
 .logo-text {
   font-family: var(--font-serif);
   font-weight: 400;
@@ -616,11 +609,11 @@ body {
     margin: 0 auto;
   }
 
-  /* The automaton sits in the top of the screen, so the last screen keeps
-     its text underneath it. */
+  /* The automaton sits in the top of the screen, so the last screen centres
+     its text in the space underneath it. */
   .chapter-final {
-    align-items: flex-end;
-    padding-top: calc(75vw + 2rem);
+    align-items: center;
+    padding-top: 75vw;
   }
 
   .flagship {
