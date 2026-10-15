@@ -128,8 +128,7 @@ body {
 }
 
 /* Kicker label — a small technical caption */
-.eyebrow,
-.status-dot {
+.eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 0.7rem;
@@ -149,20 +148,6 @@ body {
   opacity: 0.65;
 }
 
-.status-dot::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-dim);
-  animation: statusPulse 3.2s var(--ease-in-out) infinite;
-}
-
-@keyframes statusPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.45; }
-}
 
 /* ========== Header ==========
    Floats over the hero with no background, so the animation fills the screen. */
@@ -535,32 +520,6 @@ body {
   max-width: 34rem;
 }
 
-#values {
-  padding: clamp(6rem, 26vh, 16rem) 0 clamp(6rem, 30vh, 18rem);
-}
-
-#values .eyebrow {
-  margin: 0 0 clamp(2.5rem, 7vh, 4rem);
-}
-
-.values {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: clamp(4rem, 18vh, 10rem);
-}
-
-.value-num {
-  display: block;
-  margin-bottom: 1rem;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.16em;
-  color: var(--accent);
-}
-
-.value-title,
 .flagship-name {
   text-wrap: balance;
   font-family: var(--font-serif);
@@ -570,11 +529,7 @@ body {
   margin: 0 0 1.1rem;
 }
 
-.value-title {
-  font-size: clamp(2.3rem, 3.9vw, 3.4rem);
-}
 
-.value-desc,
 .lead {
   text-wrap: pretty;
   font-size: 1.0625rem;
@@ -622,13 +577,6 @@ body {
   gap: 0.7rem;
 }
 
-.flagship-next {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 1.25rem;
-  color: var(--text-muted);
-  margin: 1.25rem 0 0;
-}
 
 /* ========== Footer ========== */
 .footer {
@@ -660,12 +608,10 @@ body {
     margin-right: auto;
   }
 
-  #values .eyebrow,
   .flagship-meta {
     justify-content: center;
   }
 
-  .value-desc,
   .lead {
     margin: 0 auto;
   }
