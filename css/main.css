@@ -129,7 +129,6 @@ body {
 
 /* Kicker label — a small technical caption */
 .eyebrow,
-.hero-label,
 .status-dot {
   display: inline-flex;
   align-items: center;
@@ -142,8 +141,7 @@ body {
   color: var(--accent);
 }
 
-.eyebrow::before,
-.hero-label::before {
+.eyebrow::before {
   content: '';
   width: 22px;
   height: 1px;
@@ -234,8 +232,7 @@ body {
   gap: 2rem;
 }
 
-.nav-link,
-.lang-btn {
+.nav-link {
   font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 400;
@@ -250,31 +247,6 @@ body {
   color: var(--text-primary);
 }
 
-.lang-toggle {
-  display: flex;
-  align-items: center;
-  gap: 0.15rem;
-}
-
-.lang-btn {
-  padding: 0.25rem 0.2rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--text-muted);
-}
-
-.lang-btn + .lang-btn::before {
-  content: '/';
-  margin-right: 0.35rem;
-  color: var(--text-muted);
-}
-
-.lang-btn:hover,
-.lang-btn.active {
-  color: var(--text-primary);
-}
-
 @media (max-width: 640px) {
   .header {
     padding: 1.1rem 0;
@@ -282,10 +254,6 @@ body {
 
   .logo-text {
     font-size: 1.15rem;
-  }
-
-  .nav {
-    gap: 1.25rem;
   }
 }
 
@@ -361,9 +329,6 @@ body {
   max-width: 34rem;
 }
 
-.hero-label {
-  margin: 0 0 1.4rem;
-}
 
 .hero-title,
 .beat-title {
@@ -491,9 +456,6 @@ body {
     margin: 0 auto;
   }
 
-  .hero-label {
-    justify-content: center;
-  }
 
   .beat-desc {
     margin: 0 auto;
@@ -569,7 +531,7 @@ body {
   margin: 0;
   padding: 0;
   display: grid;
-  gap: clamp(5rem, 24vh, 13rem);
+  gap: clamp(4rem, 18vh, 10rem);
 }
 
 .value-num {
