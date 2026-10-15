@@ -65,6 +65,9 @@
     // How quickly the shown time catches up with the scroll (per second). The
     // easing turns uneven scroll input into continuous motion.
     var CATCH_UP = 9;
+    // How far the automaton drifts right after the animation, as a share of
+    // the screen width (desktop only).
+    var DRIFT = 0.08;
 
     var mobileQuery = window.matchMedia('(max-width: 860px)');
     var cue = pin.querySelector('.hero-scroll-cue');
@@ -86,6 +89,7 @@
     var lastTick = 0;
     var unlocked = false;
     var scrimOn = false;
+    var lastDrift = 0;
 
     pin.classList.add('hero-animated');
 
@@ -145,7 +149,10 @@
       duration = video.duration || 0;
       video.currentTime = shown;
     });
-    video.addEventListener('loadeddata', unlock);
+    video.addEventListener('loadeddata', function () {
+      pin.classList.add('hero-ready');
+      unlock();
+    });
     ['touchstart', 'pointerdown', 'wheel', 'keydown'].forEach(function (type) {
       window.addEventListener(type, unlock, { passive: true, once: true });
     });
@@ -206,6 +213,13 @@
         var arrive = finale ? 1 - finale.getBoundingClientRect().top / vh : 0;
         var amount = smoothstep(0.05, 0.5, past / vh) * (1 - smoothstep(0.7, 1, arrive));
         dim.style.opacity = amount.toFixed(3);
+      }
+      // On wide screens the automaton eases to the right as it finishes,
+      // giving the text column room.
+      var drift = mobileQuery.matches ? 0 : smoothstep(0.8, 0.95, progress) * window.innerWidth * DRIFT;
+      if (drift !== lastDrift) {
+        lastDrift = drift;
+        video.style.transform = drift ? 'translate3d(' + drift.toFixed(1) + 'px, 0, 0)' : '';
       }
       // Text scrolling off the top fades out under the header.
       var scrim = past > 0;
