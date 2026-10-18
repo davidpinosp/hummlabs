@@ -55,16 +55,8 @@
     // into the automaton, at 24 fps, encoded with a keyframe every 12 frames so
     // seeking anywhere is cheap.
     var DRAWING_END = 68 / 24;
-    // The drawing follows the scroll. The flight after it plays by itself at
-    // its own speed once the scroll reaches FLIGHT_AT, since scrubbing rushed
-    // the wingbeats and stopped on blurred frames; scrolling back above
-    // REWIND_AT (into the drawing) rewinds it with the scroll.
-    var FLIGHT_AT = 0.36;
-    var REWIND_AT = 0.22;
     // Scroll progress -> video time. The flat segments hold the image still on
-    // the first sketch, the finished drawing and the finished automaton. The
-    // flight segment is only scrubbed where the browser refuses to autoplay
-    // (iOS Low Power Mode).
+    // the first sketch, the finished drawing and the finished automaton.
     var END = -1;
     var TIMELINE = [
       { to: 0.05, from: 0, until: 0 },
@@ -103,8 +95,6 @@
     var target = 0;
     var lastTick = 0;
     var unlocked = false;
-    var autoplay = true;
-    var flying = false;
     var scrimOn = false;
     var lastDrift = 0;
 
@@ -147,11 +137,9 @@
     // inline play-then-pause unlocks it. It plays at a crawl so no frame moves
     // before the pause.
     function unlock() {
-      // A playing flight unlocks it as well.
-      if (unlocked || flying) return;
+      if (unlocked) return;
       video.playbackRate = 0.1;
       function settle() {
-        if (flying) return;
         video.pause();
         video.playbackRate = 1;
         video.currentTime = shown;
@@ -162,35 +150,12 @@
           unlocked = true;
           settle();
         }, function () {
-          if (!flying) video.playbackRate = 1;
+          video.playbackRate = 1;
         });
       } else {
         unlocked = true;
         settle();
       }
-    }
-
-    function startFlight() {
-      flying = true;
-      video.playbackRate = 1;
-      if (video.ended) return;
-      var attempt = video.play();
-      if (attempt && typeof attempt.then === 'function') {
-        attempt.then(function () {
-          unlocked = true;
-        }, function (err) {
-          flying = false;
-          // An AbortError only means a pause or a source change came first, so
-          // the next frame tries again. Anything else means no autoplay here,
-          // and the flight follows the scroll instead.
-          if (!err || err.name !== 'AbortError') autoplay = false;
-        });
-      }
-    }
-
-    function stopFlight() {
-      flying = false;
-      video.pause();
     }
 
     // First load: reveal the header and hero once the fonts and the first
@@ -286,13 +251,6 @@
         document.body.classList.toggle('header-scrim', scrim);
       }
       if (!duration) return;
-
-      if (autoplay && (progress >= FLIGHT_AT || (flying && progress >= REWIND_AT))) {
-        if (!flying) startFlight();
-        shown = video.currentTime;
-        return;
-      }
-      if (flying) stopFlight();
 
       target = timeAt(progress);
       shown += (target - shown) * (1 - Math.exp(-CATCH_UP * dt));
