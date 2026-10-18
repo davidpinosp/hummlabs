@@ -23,9 +23,27 @@
   <meta name="twitter:description" content="Humm Labs is an idea lab building beautiful technology for the world we want to live in. Our first company is Laburo, the AI operating system for hiring." />
   <meta name="twitter:image" content="whiteLogo.png" />
   <meta name="theme-color" content="#110c07" />
+  <script>
+    // Pick the animated hero before the first paint so the layout never
+    // switches mid-load. If the hero script doesn't start, use the still hero.
+    (function (root) {
+      try {
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      } catch (e) {}
+      root.classList.add('hero-js');
+      document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(function () {
+          if (!root.classList.contains('hero-live')) root.classList.remove('hero-js');
+        });
+      });
+    })(document.documentElement);
+  </script>
   <link rel="preload" href="fonts/cormorant-garamond-300.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="fonts/cormorant-garamond-400.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="fonts/geist.woff2" as="font" type="font/woff2" crossorigin />
-  <link rel="stylesheet" href="css/main.css?v=8486f292be" />
+  <link rel="preload" href="media/hero/hero-start-desktop.webp" as="image" type="image/webp" media="(min-width: 861px) and (prefers-reduced-motion: no-preference)" fetchpriority="high" />
+  <link rel="preload" href="media/hero/hero-start-mobile.webp" as="image" type="image/webp" media="(max-width: 860px) and (prefers-reduced-motion: no-preference)" fetchpriority="high" />
+  <link rel="stylesheet" href="css/main.css?v=cf9a65c466" />
 </head>
 <body class="landing-page">
   <div class="noise" aria-hidden="true"></div>
@@ -83,6 +101,6 @@
   </footer>
 
   <script src="js/vendor/lenis.min.js"></script>
-  <script src="js/main.js?v=7945885874"></script>
+  <script src="js/main.js?v=4421b353ed"></script>
 </body>
 </html>
