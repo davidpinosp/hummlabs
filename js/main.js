@@ -44,9 +44,12 @@
   }
 
   function initHeroSequence() {
+    var root = document.documentElement;
     var pin = document.querySelector('.hero-pin');
     var video = pin && pin.querySelector('.hero-video');
-    if (!video || typeof video.play !== 'function' || prefersReducedMotion()) return;
+    // The head script picks the animated hero (.hero-js) before the first paint.
+    if (!video || typeof video.play !== 'function' || !root.classList.contains('hero-js')) return;
+    root.classList.add('hero-live');
 
     // The video is the drawing (0 - DRAWING_END) followed by the transformation
     // into the automaton, at 24 fps, encoded with a keyframe every 12 frames so
@@ -68,6 +71,10 @@
     // How far the automaton drifts right after the animation, as a share of
     // the screen width (desktop only).
     var DRIFT = 0.08;
+    // First load waits for these fonts and the first frame, but never longer
+    // than REVEAL_WAIT (ms since navigation) before showing the text.
+    var HERO_FONTS = ['300 1em "Cormorant Garamond"', '400 1em "Cormorant Garamond"', '1em Geist', '1em "Geist Mono"'];
+    var REVEAL_WAIT = 2000;
 
     var mobileQuery = window.matchMedia('(max-width: 860px)');
     var cue = pin.querySelector('.hero-scroll-cue');
@@ -90,8 +97,6 @@
     var unlocked = false;
     var scrimOn = false;
     var lastDrift = 0;
-
-    pin.classList.add('hero-animated');
 
     function resolve(t) {
       return t === END ? Math.max(0, duration - 1 / 24) : t;
@@ -129,20 +134,38 @@
     }
 
     // iOS only paints seeked frames after the video has played once; a muted,
-    // inline play-then-pause unlocks it without any visible playback.
+    // inline play-then-pause unlocks it. It plays at a crawl so no frame moves
+    // before the pause.
     function unlock() {
       if (unlocked) return;
+      video.playbackRate = 0.1;
+      function settle() {
+        video.pause();
+        video.playbackRate = 1;
+        video.currentTime = shown;
+      }
       var attempt = video.play();
       if (attempt && typeof attempt.then === 'function') {
         attempt.then(function () {
           unlocked = true;
-          video.pause();
-          video.currentTime = shown;
-        }).catch(function () {});
+          settle();
+        }, function () {
+          video.playbackRate = 1;
+        });
       } else {
         unlocked = true;
-        video.pause();
+        settle();
       }
+    }
+
+    // First load: reveal the header and hero once the fonts and the first
+    // frame are ready, so nothing pops in or changes font on screen.
+    function reveal() {
+      root.classList.add('hero-shown');
+    }
+
+    function showFrame() {
+      root.classList.add('hero-framed');
     }
 
     video.addEventListener('loadedmetadata', function () {
@@ -150,7 +173,7 @@
       video.currentTime = shown;
     });
     video.addEventListener('loadeddata', function () {
-      pin.classList.add('hero-ready');
+      showFrame();
       unlock();
     });
     ['touchstart', 'pointerdown', 'wheel', 'keydown'].forEach(function (type) {
@@ -240,6 +263,20 @@
 
     window.addEventListener('resize', loadSet);
     loadSet();
+
+    // The poster is the first frame and is preloaded in the head. A slow
+    // connection gets the text after REVEAL_WAIT and the picture fades in
+    // when it arrives.
+    var poster = new Image();
+    poster.src = video.poster;
+    var framed = poster.decode().catch(function () {});
+    var fonts = document.fonts
+      ? Promise.all(HERO_FONTS.map(function (font) { return document.fonts.load(font); }))
+      : null;
+    framed.then(showFrame);
+    Promise.all([framed, fonts]).then(reveal, reveal);
+    setTimeout(reveal, Math.max(0, REVEAL_WAIT - performance.now()));
+
     requestAnimationFrame(tick);
   }
 

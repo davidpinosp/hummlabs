@@ -237,12 +237,13 @@ body {
 
 /* ========== Hero ==========
    Default (no JS / reduced motion): the finished automaton with the three
-   statements over it. With .hero-animated the hero is fixed behind the whole
-   page and the script scrubs the sketch-to-automaton video while .hero-pin
-   scrolls past (--run is that distance). Each statement scrolls in, sticks at
-   its resting height --y while the animation plays, then scrolls out; the
-   script drives that from the data-in / data-out ranges. After the pin the
-   finished automaton stays on screen and the chapters scroll in over it. */
+   statements over it. With .hero-js (set on <html> before the first paint)
+   the hero is fixed behind the whole page and the script runs the
+   sketch-to-automaton video while .hero-pin scrolls past (--run is that
+   distance). Each statement scrolls in, sticks at its resting height --y while
+   the animation plays, then scrolls out; the script drives that from the
+   data-in / data-out ranges. After the pin the finished automaton stays on
+   screen and the chapters scroll in over it. */
 .hero-pin {
   position: relative;
 }
@@ -340,53 +341,64 @@ body {
   display: none;
 }
 
-/* Scroll-driven mode */
-.hero-animated {
+/* Scroll-driven mode. The first frame is the video's own poster, so it gets
+   the same fit and edge mask as the video and the hand-off is invisible. */
+.hero-js .hero-pin {
   --run: 520vh;
   height: calc(100vh + var(--run));
 }
 
-.hero-animated .hero {
+.hero-js .hero {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 100vh;
   min-height: 0;
-  background: var(--bg-main) url("../media/hero/hero-start-desktop.webp") 35% center / cover no-repeat;
-}
-
-.hero-animated .hero-video,
-.hero-animated .hero-dim {
-  display: block;
-}
-
-/* Once the video has a frame, drop the poster behind it so the automaton
-   can drift without uncovering it. */
-.hero-animated.hero-ready .hero {
   background: var(--bg-main);
 }
 
-.hero-animated .hero-video {
+.hero-js .hero-video,
+.hero-js .hero-dim {
+  display: block;
+}
+
+.hero-js .hero-video {
   will-change: transform;
   -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14%);
   mask-image: linear-gradient(90deg, transparent 0, #000 14%);
 }
 
-.hero-animated .hero-content {
+/* First load: the header and hero wait on the background colour until the
+   fonts and the first frame are ready, then fade in together. If the text is
+   revealed first (slow connection), the picture fades in when it arrives. */
+.hero-js .header,
+.hero-js .hero,
+.hero-js .hero-video {
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-out);
+}
+
+.hero-shown .header,
+.hero-shown .hero,
+.hero-framed .hero-video {
+  opacity: 1;
+}
+
+.hero-js .hero-content {
   bottom: 0;
   padding: 0;
   z-index: 2;
   pointer-events: none;
 }
 
-.hero-animated .hero-beats {
+.hero-js .hero-beats {
   display: block;
   position: relative;
   height: 100%;
 }
 
-.hero-animated .beat {
+.hero-js .beat {
   position: absolute;
   left: 0;
   top: var(--y);
@@ -395,7 +407,7 @@ body {
   will-change: opacity, transform;
 }
 
-.hero-animated .hero-scroll-cue {
+.hero-js .hero-scroll-cue {
   display: block;
   position: absolute;
   left: 50%;
@@ -451,31 +463,27 @@ body {
     margin: 0 auto;
   }
 
-  .hero-animated {
+  .hero-js .hero-pin {
     --run: 440vh;
   }
 
-  .hero-animated .hero {
-    background: var(--bg-main) url("../media/hero/hero-start-mobile.webp") center top / 100% auto no-repeat;
-  }
-
-  .hero-animated .hero-video {
+  .hero-js .hero-video {
     -webkit-mask-image: none;
     mask-image: none;
   }
 
-  .hero-animated .hero-content {
+  .hero-js .hero-content {
     position: absolute;
     padding: 0;
   }
 
-  .hero-animated .beat {
+  .hero-js .beat {
     left: 0;
     right: 0;
     top: 70vh;
   }
 
-  .hero-animated .hero-scroll-cue {
+  .hero-js .hero-scroll-cue {
     bottom: 1rem;
   }
 }
