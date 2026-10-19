@@ -82,12 +82,6 @@
     var FRAME_COUNT = 310;
     var FRAME_URL = 'media/hero/frames/';
     var FRAME_LOADS = 6;
-    // Frames this far either side of the current one are kept decoded, so a
-    // draw never waits on a decode (about 8 MB each at full size).
-    var DECODE_AHEAD = 8;
-    // Only the coarse passes load at once; the rest wait for the visitor to
-    // interact, or this long after the page has loaded.
-    var FINE_FRAMES_AFTER = 3000;
 
     var mobileQuery = window.matchMedia('(max-width: 860px)');
     var useFrames = !mobileQuery.matches;
@@ -190,14 +184,12 @@
     var canvas = null;
     var ctx = null;
     var frames = [];
-    var decoded = {};
     var drawn = -1;
     var frameDirty = true;
 
     function loadFrames() {
       var order = [];
       var queued = {};
-      var coarse = 0;
       [16, 8, 4, 2, 1].forEach(function (step) {
         for (var i = 0; i < FRAME_COUNT; i += step) {
           if (!queued[i]) {
@@ -205,72 +197,23 @@
             order.push(i);
           }
         }
-        if (step === 8) coarse = order.length;
       });
       if (!queued[FRAME_COUNT - 1]) order.splice(1, 0, FRAME_COUNT - 1);
-      coarse += 1;
       var next = 0;
-      var limit = coarse;
-      var active = 0;
-      function fine() {
-        if (limit === order.length) return;
-        limit = order.length;
-        while (active < FRAME_LOADS && next < limit) pump();
-      }
-      ['wheel', 'touchstart', 'pointerdown', 'keydown', 'scroll'].forEach(function (type) {
-        window.addEventListener(type, fine, { passive: true, once: true });
-      });
-      window.addEventListener('load', function () {
-        setTimeout(fine, FINE_FRAMES_AFTER);
-      });
       function pump() {
-        if (next >= limit) return;
-        active++;
+        if (next >= order.length) return;
         var i = order[next++];
         var img = new Image();
         img.decoding = 'async';
         img.onload = function () {
-          active--;
           frames[i] = img;
           frameDirty = true;
           pump();
         };
-        img.onerror = function () {
-          active--;
-          pump();
-        };
+        img.onerror = pump;
         img.src = FRAME_URL + ('00' + i).slice(-3) + '.webp';
       }
       for (var n = 0; n < FRAME_LOADS; n++) pump();
-    }
-
-    // Keeps the loaded frames near `center` decoded as bitmaps and releases
-    // the rest. A pending decode is marked true until its bitmap arrives.
-    function keepDecoded(center) {
-      if (typeof window.createImageBitmap !== 'function') return;
-      Object.keys(decoded).forEach(function (key) {
-        if (Math.abs(key - center) <= DECODE_AHEAD) return;
-        if (decoded[key] !== true) decoded[key].close();
-        delete decoded[key];
-      });
-      var from = Math.max(0, center - DECODE_AHEAD);
-      var to = Math.min(FRAME_COUNT - 1, center + DECODE_AHEAD);
-      for (var i = from; i <= to; i++) {
-        if (frames[i] && !decoded[i]) decodeFrame(i);
-      }
-    }
-
-    function decodeFrame(i) {
-      decoded[i] = true;
-      createImageBitmap(frames[i]).then(function (bitmap) {
-        if (decoded[i] === true) {
-          decoded[i] = bitmap;
-        } else {
-          bitmap.close();
-        }
-      }, function () {
-        delete decoded[i];
-      });
     }
 
     function nearestFrame(i) {
@@ -303,8 +246,7 @@
       var w = img.naturalWidth * scale;
       var h = img.naturalHeight * scale;
       var focus = mobileQuery.matches ? 0.5 : 0.35;
-      var source = decoded[f] && decoded[f] !== true ? decoded[f] : img;
-      ctx.drawImage(source, (cw - w) * focus, (ch - h) / 2, w, h);
+      ctx.drawImage(img, (cw - w) * focus, (ch - h) / 2, w, h);
       drawn = f;
     }
 
@@ -416,9 +358,7 @@
         // The frame follows the scroll directly; Lenis already smooths it.
         frameDirty = false;
         sizeCanvas();
-        var index = Math.min(FRAME_COUNT - 1, Math.round(target * 24));
-        keepDecoded(index);
-        drawFrame(index);
+        drawFrame(Math.min(FRAME_COUNT - 1, Math.round(target * 24)));
         return;
       }
       shown += (target - shown) * (1 - Math.exp(-CATCH_UP * dt));
