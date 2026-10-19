@@ -75,23 +75,8 @@
     // than REVEAL_WAIT (ms since navigation) before showing the text.
     var HERO_FONTS = ['300 1em "Cormorant Garamond"', '400 1em "Cormorant Garamond"', '1em Geist', '1em "Geist Mono"'];
     var REVEAL_WAIT = 2000;
-    // Desktop draws the animation from a sequence of stills on a canvas, the
-    // way Apple's product pages do: any frame shows the moment it is asked
-    // for, where seeking a video decodes from the last keyframe and lags the
-    // scroll. Phones keep the video, which is a third of the download.
-    var FRAME_COUNT = 310;
-    var FRAME_URL = 'media/hero/frames/';
-    var FRAME_LOADS = 6;
-    // Frames this far either side of the current one are kept decoded, so a
-    // draw never waits on a decode (about 8 MB each at full size).
-    var DECODE_AHEAD = 8;
-    // Only the coarse passes load at once; the rest wait for the visitor to
-    // interact, or this long after the page has loaded.
-    var FINE_FRAMES_AFTER = 3000;
 
     var mobileQuery = window.matchMedia('(max-width: 860px)');
-    var useFrames = !mobileQuery.matches;
-    var stage = video;
     var cue = pin.querySelector('.hero-scroll-cue');
     var dim = pin.querySelector('.hero-dim');
     var finale = document.querySelector('.chapter-final');
@@ -112,7 +97,6 @@
     var unlocked = false;
     var scrimOn = false;
     var lastDrift = 0;
-    var lastView = '';
 
     function resolve(t) {
       return t === END ? Math.max(0, duration - 1 / 24) : t;
@@ -184,142 +168,6 @@
       root.classList.add('hero-framed');
     }
 
-    // Frame sequence. Frames load coarse to fine (every 16th, then every 8th,
-    // and so on), so the whole animation can be scrubbed early and sharpens
-    // as the rest arrive; until then the nearest loaded frame stands in.
-    var canvas = null;
-    var ctx = null;
-    var frames = [];
-    var decoded = {};
-    var drawn = -1;
-    var frameDirty = true;
-
-    function loadFrames() {
-      var order = [];
-      var queued = {};
-      var coarse = 0;
-      [16, 8, 4, 2, 1].forEach(function (step) {
-        for (var i = 0; i < FRAME_COUNT; i += step) {
-          if (!queued[i]) {
-            queued[i] = true;
-            order.push(i);
-          }
-        }
-        if (step === 8) coarse = order.length;
-      });
-      if (!queued[FRAME_COUNT - 1]) order.splice(1, 0, FRAME_COUNT - 1);
-      coarse += 1;
-      var next = 0;
-      var limit = coarse;
-      var active = 0;
-      function fine() {
-        if (limit === order.length) return;
-        limit = order.length;
-        while (active < FRAME_LOADS && next < limit) pump();
-      }
-      ['wheel', 'touchstart', 'pointerdown', 'keydown', 'scroll'].forEach(function (type) {
-        window.addEventListener(type, fine, { passive: true, once: true });
-      });
-      window.addEventListener('load', function () {
-        setTimeout(fine, FINE_FRAMES_AFTER);
-      });
-      function pump() {
-        if (next >= limit) return;
-        active++;
-        var i = order[next++];
-        var img = new Image();
-        img.decoding = 'async';
-        img.onload = function () {
-          active--;
-          frames[i] = img;
-          frameDirty = true;
-          pump();
-        };
-        img.onerror = function () {
-          active--;
-          pump();
-        };
-        img.src = FRAME_URL + ('00' + i).slice(-3) + '.webp';
-      }
-      for (var n = 0; n < FRAME_LOADS; n++) pump();
-    }
-
-    // Keeps the loaded frames near `center` decoded as bitmaps and releases
-    // the rest. A pending decode is marked true until its bitmap arrives.
-    function keepDecoded(center) {
-      if (typeof window.createImageBitmap !== 'function') return;
-      Object.keys(decoded).forEach(function (key) {
-        if (Math.abs(key - center) <= DECODE_AHEAD) return;
-        if (decoded[key] !== true) decoded[key].close();
-        delete decoded[key];
-      });
-      var from = Math.max(0, center - DECODE_AHEAD);
-      var to = Math.min(FRAME_COUNT - 1, center + DECODE_AHEAD);
-      for (var i = from; i <= to; i++) {
-        if (frames[i] && !decoded[i]) decodeFrame(i);
-      }
-    }
-
-    function decodeFrame(i) {
-      decoded[i] = true;
-      createImageBitmap(frames[i]).then(function (bitmap) {
-        if (decoded[i] === true) {
-          decoded[i] = bitmap;
-        } else {
-          bitmap.close();
-        }
-      }, function () {
-        delete decoded[i];
-      });
-    }
-
-    function nearestFrame(i) {
-      for (var d = 0; d < FRAME_COUNT; d++) {
-        if (frames[i - d]) return i - d;
-        if (frames[i + d]) return i + d;
-      }
-      return -1;
-    }
-
-    function sizeCanvas() {
-      var ratio = Math.min(window.devicePixelRatio || 1, 2);
-      var w = Math.round(canvas.clientWidth * ratio);
-      var h = Math.round(canvas.clientHeight * ratio);
-      if (canvas.width !== w || canvas.height !== h) {
-        canvas.width = w;
-        canvas.height = h;
-        drawn = -1;
-      }
-    }
-
-    // Draws like object-fit: cover, at the same focal point as the video.
-    function drawFrame(i) {
-      var f = nearestFrame(i);
-      if (f < 0 || f === drawn) return;
-      var img = frames[f];
-      var cw = canvas.width;
-      var ch = canvas.height;
-      var scale = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
-      var w = img.naturalWidth * scale;
-      var h = img.naturalHeight * scale;
-      var focus = mobileQuery.matches ? 0.5 : 0.35;
-      var source = decoded[f] && decoded[f] !== true ? decoded[f] : img;
-      ctx.drawImage(source, (cw - w) * focus, (ch - h) / 2, w, h);
-      drawn = f;
-    }
-
-    if (useFrames) {
-      canvas = document.createElement('canvas');
-      canvas.className = 'hero-video';
-      canvas.setAttribute('aria-hidden', 'true');
-      video.parentNode.replaceChild(canvas, video);
-      ctx = canvas.getContext('2d');
-      ctx.imageSmoothingQuality = 'high';
-      stage = canvas;
-      duration = FRAME_COUNT / 24;
-      loadFrames();
-    }
-
     video.addEventListener('loadedmetadata', function () {
       duration = video.duration || 0;
       video.currentTime = shown;
@@ -328,11 +176,9 @@
       showFrame();
       unlock();
     });
-    if (!useFrames) {
-      ['touchstart', 'pointerdown', 'wheel', 'keydown'].forEach(function (type) {
-        window.addEventListener(type, unlock, { passive: true, once: true });
-      });
-    }
+    ['touchstart', 'pointerdown', 'wheel', 'keydown'].forEach(function (type) {
+      window.addEventListener(type, unlock, { passive: true, once: true });
+    });
 
     function clamp01(v) {
       return Math.max(0, Math.min(1, v));
@@ -382,11 +228,6 @@
       var progress = scrollable > 0 ? clamp01(-rect.top / scrollable) : 0;
       var past = Math.max(0, -rect.top - scrollable);
 
-      // With frames, nothing changes unless the page moved or a frame arrived.
-      var view = rect.top + ' ' + vh + ' ' + window.innerWidth;
-      if (useFrames && view === lastView && !frameDirty) return;
-      lastView = view;
-
       updateBeats(progress, past);
       if (cue) cue.style.opacity = 1 - smoothstep(0, 0.04, progress);
       // Darken the automaton while text passes over it, and bring it back for
@@ -401,7 +242,7 @@
       var drift = mobileQuery.matches ? 0 : smoothstep(0.8, 0.95, progress) * window.innerWidth * DRIFT;
       if (drift !== lastDrift) {
         lastDrift = drift;
-        stage.style.transform = drift ? 'translate3d(' + drift.toFixed(1) + 'px, 0, 0)' : '';
+        video.style.transform = drift ? 'translate3d(' + drift.toFixed(1) + 'px, 0, 0)' : '';
       }
       // Text scrolling off the top fades out under the header.
       var scrim = past > 0;
@@ -412,15 +253,6 @@
       if (!duration) return;
 
       target = timeAt(progress);
-      if (useFrames) {
-        // The frame follows the scroll directly; Lenis already smooths it.
-        frameDirty = false;
-        sizeCanvas();
-        var index = Math.min(FRAME_COUNT - 1, Math.round(target * 24));
-        keepDecoded(index);
-        drawFrame(index);
-        return;
-      }
       shown += (target - shown) * (1 - Math.exp(-CATCH_UP * dt));
       if (Math.abs(target - shown) < 0.002) shown = target;
       // One seek at a time: queueing seeks makes the browser fall behind.
@@ -429,16 +261,14 @@
       }
     }
 
-    if (!useFrames) {
-      window.addEventListener('resize', loadSet);
-      loadSet();
-    }
+    window.addEventListener('resize', loadSet);
+    loadSet();
 
-    // The first frame (the poster, or frame 0) is preloaded in the head. A
-    // slow connection gets the text after REVEAL_WAIT and the picture fades
-    // in when it arrives.
+    // The poster is the first frame and is preloaded in the head. A slow
+    // connection gets the text after REVEAL_WAIT and the picture fades in
+    // when it arrives.
     var poster = new Image();
-    poster.src = useFrames ? FRAME_URL + '000.webp' : video.poster;
+    poster.src = video.poster;
     var framed = poster.decode().catch(function () {});
     var fonts = document.fonts
       ? Promise.all(HERO_FONTS.map(function (font) { return document.fonts.load(font); }))
